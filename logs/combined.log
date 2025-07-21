@@ -8,3 +8,50 @@
 {"level":"info","message":"Aerodrome Router: 0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43","timestamp":"2025-07-25T00:00:57.949Z"}
 {"level":"info","message":"✅ Basic setup is working!","timestamp":"2025-07-25T00:00:57.949Z"}
 {"level":"info","message":"🧪 Running test command...","timestamp":"2025-07-25T00:00:57.950Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-25T00:11:48.215Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-25T00:11:48.219Z"}
+{"level":"info","message":"RPC URL: https://go.getblock.us/34e924dc24f4427796ab67d045a0dc1e","timestamp":"2025-07-25T00:11:48.219Z"}
+{"level":"info","message":"Agent wallet initialized: 0x65655D5d18F41775156CdFb53cC5710E13380070","timestamp":"2025-07-25T00:11:48.273Z"}
+{"level":"info","message":"🧪 Testing wallet service...","timestamp":"2025-07-25T00:11:48.273Z"}
+{"level":"info","message":"Network: base (Chain ID: 8453)","timestamp":"2025-07-25T00:11:49.086Z"}
+{"level":"info","message":"Agent balance: 0.021982457988898589 ETH","timestamp":"2025-07-25T00:11:49.967Z"}
+{"level":"info","message":"✅ Gas balance sufficient: 0.021982457988898589 ETH","timestamp":"2025-07-25T00:11:50.764Z"}
+{"level":"info","message":"✅ Wallet service test passed!","timestamp":"2025-07-25T00:11:50.764Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-25T00:30:06.394Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-25T00:30:06.396Z"}
+{"level":"info","message":"RPC URL: https://go.getblock.us/34e924dc24f4427796ab67d045a0dc1e","timestamp":"2025-07-25T00:30:06.397Z"}
+{"level":"info","message":"Agent wallet initialized: 0x65655D5d18F41775156CdFb53cC5710E13380070","timestamp":"2025-07-25T00:30:06.449Z"}
+{"level":"info","message":"🧪 Testing wallet service...","timestamp":"2025-07-25T00:30:06.450Z"}
+{"level":"info","message":"Network: base (Chain ID: 8453)","timestamp":"2025-07-25T00:30:07.504Z"}
+{"level":"info","message":"Agent balance: 0.021979320143695264 ETH","timestamp":"2025-07-25T00:30:08.416Z"}
+{"level":"info","message":"✅ Gas balance sufficient: 0.021979320143695264 ETH","timestamp":"2025-07-25T00:30:09.335Z"}
+{"level":"info","message":"✅ Wallet service test passed!","timestamp":"2025-07-25T00:30:09.336Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-25T00:33:14.217Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-25T00:33:14.219Z"}
+{"level":"info","message":"RPC URL: https://go.getblock.us/34e924dc24f4427796ab67d045a0dc1e","timestamp":"2025-07-25T00:33:14.220Z"}
+{"level":"info","message":"Agent wallet initialized: 0x65655D5d18F41775156CdFb53cC5710E13380070","timestamp":"2025-07-25T00:33:14.278Z"}
+{"level":"info","message":"📊 Agent Status:","timestamp":"2025-07-25T00:33:14.279Z"}
+{"level":"info","message":"===============","timestamp":"2025-07-25T00:33:14.279Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-25T00:41:44.737Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-25T00:41:44.740Z"}
+{"level":"info","message":"RPC URL: https://go.getblock.us/34e924dc24f4427796ab67d045a0dc1e","timestamp":"2025-07-25T00:41:44.740Z"}
+{"level":"info","message":"Agent wallet initialized: 0x65655D5d18F41775156CdFb53cC5710E13380070","timestamp":"2025-07-25T00:41:44.793Z"}
+{"level":"info","message":"🧪 Testing token service...","timestamp":"2025-07-25T00:41:44.794Z"}
+{"level":"info","message":"Getting USDC token info...","timestamp":"2025-07-25T00:41:44.794Z"}
+{"level":"info","message":"USDC: USD Coin (USDC) - 6 decimals","timestamp":"2025-07-25T00:41:45.916Z"}
+{"level":"info","message":"Getting WETH token info...","timestamp":"2025-07-25T00:41:45.916Z"}
+{"level":"info","message":"WETH: Wrapped Ether (WETH) - 18 decimals","timestamp":"2025-07-25T00:41:46.776Z"}
+{"level":"info","message":"Getting VIRTUAL token info...","timestamp":"2025-07-25T00:41:46.777Z"}
+{"level":"info","message":"VIRTUAL: Virtual Protocol (VIRTUAL) - 18 decimals","timestamp":"2025-07-25T00:41:47.512Z"}
+{"level":"info","message":"✅ Token service test passed!","timestamp":"2025-07-25T00:41:47.513Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-25T00:42:00.650Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-25T00:42:00.653Z"}
+{"level":"info","message":"RPC URL: https://go.getblock.us/34e924dc24f4427796ab67d045a0dc1e","timestamp":"2025-07-25T00:42:00.653Z"}
+{"level":"info","message":"Agent wallet initialized: 0x65655D5d18F41775156CdFb53cC5710E13380070","timestamp":"2025-07-25T00:42:00.707Z"}
+{"level":"info","message":"💰 Checking token balances...","timestamp":"2025-07-25T00:42:00.707Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-25T00:42:15.261Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-25T00:42:15.263Z"}
+{"level":"info","message":"RPC URL: https://go.getblock.us/34e924dc24f4427796ab67d045a0dc1e","timestamp":"2025-07-25T00:42:15.263Z"}
+{"level":"info","message":"Agent wallet initialized: 0x65655D5d18F41775156CdFb53cC5710E13380070","timestamp":"2025-07-25T00:42:15.317Z"}
+{"level":"info","message":"📊 Agent Status:","timestamp":"2025-07-25T00:42:15.317Z"}
+{"level":"info","message":"===============","timestamp":"2025-07-25T00:42:15.318Z"}
