@@ -1,0 +1,33 @@
+{
+  "name": "aerodrome-lp-agent",
+  "version": "1.0.0",
+  "description": "Automated liquidity provision agent for Aerodrome WETH-VIRTUAL pool on Base",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
+    "watch": "nodemon --exec ts-node src/index.ts",
+    "test": "echo \"Tests will be added later\""
+  },
+  "dependencies": {
+    "ethers": "^6.8.1",
+    "dotenv": "^16.3.1",
+    "winston": "^3.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.8.0",
+    "typescript": "^5.2.2",
+    "ts-node": "^10.9.1",
+    "nodemon": "^3.0.1"
+  },
+  "keywords": [
+    "defi",
+    "aerodrome",
+    "liquidity",
+    "automation",
+    "base"
+  ],
+  "author": "Surbhi Audichya",
+  "license": "MIT"
+}

@@ -1,0 +1,10 @@
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-25T00:00:57.945Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-25T00:00:57.948Z"}
+{"level":"info","message":"RPC URL: https://go.getblock.us/34e924dc24f4427796ab67d045a0dc1e","timestamp":"2025-07-25T00:00:57.948Z"}
+{"level":"info","message":"Contract addresses loaded:","timestamp":"2025-07-25T00:00:57.948Z"}
+{"level":"info","message":"USDC: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913","timestamp":"2025-07-25T00:00:57.948Z"}
+{"level":"info","message":"WETH: 0x4200000000000000000000000000000000000006","timestamp":"2025-07-25T00:00:57.949Z"}
+{"level":"info","message":"VIRTUAL: 0x0b3e328455c4059eeb9e3f84b5543f74e24e7e1b","timestamp":"2025-07-25T00:00:57.949Z"}
+{"level":"info","message":"Aerodrome Router: 0xcF77a3Ba9A5CA399B7c97c74d54e5b1Beb874E43","timestamp":"2025-07-25T00:00:57.949Z"}
+{"level":"info","message":"✅ Basic setup is working!","timestamp":"2025-07-25T00:00:57.949Z"}
+{"level":"info","message":"🧪 Running test command...","timestamp":"2025-07-25T00:00:57.950Z"}

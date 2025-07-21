@@ -1,0 +1,9 @@
+# .gitignore
+.env
+.env.*
+*.env
+*.key
+*.pem
+node_modules/
+dist/
+build/
