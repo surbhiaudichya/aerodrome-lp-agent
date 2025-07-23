@@ -39,6 +39,9 @@ export class TokenService {
     const address = account || this.walletService.getAgentWallet().address;
 
     try {
+      // Add a small delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 100));
+
       const [balanceWei, decimals] = await Promise.all([contract.balanceOf(address), contract.decimals()]);
 
       const balance = formatUnits(balanceWei, decimals);
@@ -49,7 +52,16 @@ export class TokenService {
         balanceWei,
         decimals: Number(decimals),
       };
-    } catch (error) {
+    } catch (error: any) {
+      if (error?.info?.error?.message?.includes("rate limit")) {
+        logger.warn(`Rate limit hit for ${tokenAddress}, using fallback`);
+        return {
+          token: tokenAddress,
+          balance: "0.0",
+          balanceWei: 0n,
+          decimals: 18,
+        };
+      }
       logger.error(`Failed to get balance for ${tokenAddress}:`, error);
       throw error;
     }
@@ -100,6 +112,23 @@ export class TokenService {
       return receipt.hash;
     } catch (error) {
       logger.error(`Token transfer failed:`, error);
+      throw error;
+    }
+  }
+
+  async transferFrom(tokenAddress: string, from: string, to: string, amount: bigint): Promise<string> {
+    const contract = this.getTokenContract(tokenAddress);
+
+    logger.info(`Transferring ${amount.toString()} tokens from ${from} to ${to}`);
+
+    try {
+      const tx = await contract.transferFrom(from, to, amount);
+      const receipt = await tx.wait();
+
+      logger.info(`Token transferFrom successful: ${receipt.hash}`);
+      return receipt.hash;
+    } catch (error) {
+      logger.error(`Token transferFrom failed:`, error);
       throw error;
     }
   }
