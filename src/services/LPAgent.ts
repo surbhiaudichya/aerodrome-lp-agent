@@ -6,34 +6,43 @@ import { CONTRACTS } from "../config/contracts";
 import { DepositParams, SwapRoute } from "../types";
 import { parseUnits, formatUnits } from "../utils/helpers";
 import { logger } from "../utils/logger";
+import { GaugeService } from "./GaugeService";
 
 export class LPAgent {
   private walletService: WalletService;
   private tokenService: TokenService;
   private aerodromeService: AerodromeService;
+  private gaugeService: GaugeService;
 
   constructor(walletService: WalletService, tokenService: TokenService, aerodromeService: AerodromeService) {
     this.walletService = walletService;
     this.tokenService = tokenService;
     this.aerodromeService = aerodromeService;
+    this.gaugeService = new GaugeService(walletService);
   }
 
   async getAgentBalances(): Promise<{
     eth: string;
     usdc: string;
     weth: string;
+    lpTokens: string;
+    stakedLP: string; // ADD THIS LINE
   }> {
     try {
-      const [eth, usdcBalance, wethBalance] = await Promise.all([
+      const [eth, usdcBalance, wethBalance, lpBalance, stakedLPWei] = await Promise.all([
         this.walletService.getAgentBalance(),
         this.tokenService.getBalance(CONTRACTS.USDC),
         this.tokenService.getBalance(CONTRACTS.WETH),
+        this.tokenService.getBalance(this.aerodromeService.getPoolAddress()),
+        this.gaugeService.getStakedBalance(), // ADD THIS LINE
       ]);
 
       return {
         eth,
         usdc: usdcBalance.balance,
         weth: wethBalance.balance,
+        lpTokens: lpBalance.balance,
+        stakedLP: formatUnits(stakedLPWei, 18), // ADD THIS LINE
       };
     } catch (error) {
       logger.error("Failed to get agent balances:", error);
@@ -41,6 +50,8 @@ export class LPAgent {
         eth: "Error",
         usdc: "Error",
         weth: "Error",
+        lpTokens: "Error",
+        stakedLP: "Error", // ADD THIS LINE
       };
     }
   }
@@ -49,6 +60,7 @@ export class LPAgent {
     logger.info("🔄 Initializing LP Agent...");
 
     await this.aerodromeService.initialize();
+    await this.gaugeService.initialize(this.aerodromeService.getPoolAddress());
     await this.walletService.ensureGasBalance("0.005");
 
     logger.info("✅ LP Agent initialized successfully");
@@ -331,6 +343,93 @@ export class LPAgent {
         lpAmount: "0",
         error: String(error),
       };
+    }
+  }
+
+  async stakeExistingLP(): Promise<{
+    success: boolean;
+    txHash?: string;
+    stakedAmount: string;
+    error?: string;
+  }> {
+    try {
+      logger.info("🥩 Staking existing LP tokens...");
+
+      // Get current LP token balance
+      const lpBalance = await this.tokenService.getBalance(this.aerodromeService.getPoolAddress());
+
+      if (parseFloat(lpBalance.balance) === 0) {
+        return {
+          success: false,
+          stakedAmount: "0",
+          error: "No LP tokens to stake",
+        };
+      }
+
+      logger.info(`Found ${lpBalance.balance} LP tokens to stake`);
+
+      // Step 1: Approve LP tokens for gauge
+      logger.info("🔓 Approving LP tokens for gauge...");
+      const approvalTx = await this.tokenService.approve(
+        this.aerodromeService.getPoolAddress(),
+        this.gaugeService.getGaugeAddress(),
+        lpBalance.balanceWei,
+      );
+
+      // Step 2: Stake LP tokens
+      logger.info("🥩 Staking LP tokens in gauge...");
+      const stakingTx = await this.gaugeService.stakeLPTokens(lpBalance.balanceWei);
+
+      logger.info(`✅ Successfully staked ${lpBalance.balance} LP tokens!`);
+
+      return {
+        success: true,
+        txHash: stakingTx,
+        stakedAmount: lpBalance.balance,
+      };
+    } catch (error) {
+      logger.error("❌ LP staking failed:", error);
+      return {
+        success: false,
+        stakedAmount: "0",
+        error: String(error),
+      };
+    }
+  }
+
+  async getPositionReceipt(userAddress: string): Promise<{
+    userAddress: string;
+    agentAddress: string;
+    poolAddress: string;
+    gaugeAddress: string;
+    stakedLPAmount: string;
+    unstakedLPAmount: string;
+    totalLPValue: string;
+    timestamp: string;
+  }> {
+    try {
+      const [stakedLPWei, unstakedLPBalance] = await Promise.all([
+        this.gaugeService.getStakedBalance(),
+        this.tokenService.getBalance(this.aerodromeService.getPoolAddress()),
+      ]);
+
+      const stakedLPAmount = formatUnits(stakedLPWei, 18);
+      const unstakedLPAmount = unstakedLPBalance.balance;
+      const totalLPValue = (parseFloat(stakedLPAmount) + parseFloat(unstakedLPAmount)).toString();
+
+      return {
+        userAddress,
+        agentAddress: this.walletService.getAgentWallet().address,
+        poolAddress: this.aerodromeService.getPoolAddress(),
+        gaugeAddress: this.gaugeService.getGaugeAddress(),
+        stakedLPAmount,
+        unstakedLPAmount,
+        totalLPValue,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error) {
+      logger.error("Failed to get position receipt:", error);
+      throw error;
     }
   }
 }

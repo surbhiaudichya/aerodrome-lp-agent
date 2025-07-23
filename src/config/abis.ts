@@ -21,4 +21,20 @@ export const ABIS = {
 
   // Aerodrome Factory - to get pool addresses
   AERODROME_FACTORY: ["function getPool(address tokenA, address tokenB, bool stable) view returns (address pool)"],
+
+  // NEW: Aerodrome Gauge ABI - for staking LP tokens
+  AERODROME_GAUGE: [
+    "function deposit(uint256 amount)",
+    "function withdraw(uint256 amount)",
+    "function balanceOf(address account) view returns (uint256)",
+    "function earned(address account) view returns (uint256)",
+    "function getReward()",
+    "function totalSupply() view returns (uint256)",
+  ],
+
+  // NEW: Aerodrome Voter ABI - to find gauge addresses
+  AERODROME_VOTER: [
+    "function gauges(address pool) view returns (address gauge)",
+    "function isGauge(address gauge) view returns (bool)",
+  ],
 };

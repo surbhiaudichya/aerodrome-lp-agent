@@ -744,3 +744,152 @@
 {"level":"info","message":"Adding liquidity: 957647238326360 + 2259450606035209143","timestamp":"2025-07-25T23:56:06.496Z"}
 {"level":"info","message":"Min amounts: 0 + 0 (accepting pool ratio)","timestamp":"2025-07-25T23:56:06.496Z"}
 {"level":"info","message":"✅ Add liquidity successful: 0xf2c4ee160fe14377bf11feee8f265d80b2f220d8d3c6f13a185f019e193dd512","timestamp":"2025-07-25T23:56:14.978Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T03:09:59.154Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T03:09:59.156Z"}
+{"level":"info","message":"RPC URL: https://mainnet.base.org/34e924dc24f4427796ab67d045a0dc1e","timestamp":"2025-07-26T03:09:59.156Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T03:09:59.206Z"}
+{"level":"info","message":"🧪 Testing Gauge service...","timestamp":"2025-07-26T03:09:59.211Z"}
+{"level":"info","message":"🔄 Initializing Aerodrome service...","timestamp":"2025-07-26T03:09:59.211Z"}
+{"level":"info","message":"✅ WETH-VIRTUAL Pool found: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T03:10:00.615Z"}
+{"level":"info","message":"🔄 Initializing Gauge service...","timestamp":"2025-07-26T03:10:00.616Z"}
+{"level":"info","message":"✅ Gauge found: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T03:10:00.991Z"}
+{"level":"info","message":"✅ Gauge service initialized successfully","timestamp":"2025-07-26T03:10:00.993Z"}
+{"level":"info","message":"Pool Address: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T03:10:00.994Z"}
+{"level":"info","message":"Gauge Address: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T03:10:00.994Z"}
+{"level":"info","message":"✅ Gauge total supply: 63569.654423287363890753 LP tokens","timestamp":"2025-07-26T03:10:01.314Z"}
+{"level":"info","message":"Agent LP Balance: 0.04614830642030241","timestamp":"2025-07-26T03:10:01.771Z"}
+{"action":"call","code":"CALL_EXCEPTION","data":null,"info":{"error":{"code":-32016,"message":"over rate limit"},"payload":{"id":10,"jsonrpc":"2.0","method":"eth_call","params":[{"data":"0x70a08231000000000000000000000000747dc4a00d0efda9053a29e691c60d0bfc9fc180","from":"0x747dc4a00d0efda9053a29e691c60d0bfc9fc180","to":"0xbd62cad65b49b4ad9c7aa9b8bdb89d63221f7af5"},"latest"]}},"invocation":null,"level":"error","message":"❌ Gauge service test failed: missing revert data (action=\"call\", data=null, reason=null, transaction={ \"data\": \"0x70a08231000000000000000000000000747dc4a00d0efda9053a29e691c60d0bfc9fc180\", \"from\": \"0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180\", \"to\": \"0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5\" }, invocation=null, revert=null, code=CALL_EXCEPTION, version=6.15.0)","reason":null,"revert":null,"shortMessage":"missing revert data","stack":"Error: missing revert data (action=\"call\", data=null, reason=null, transaction={ \"data\": \"0x70a08231000000000000000000000000747dc4a00d0efda9053a29e691c60d0bfc9fc180\", \"from\": \"0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180\", \"to\": \"0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5\" }, invocation=null, revert=null, code=CALL_EXCEPTION, version=6.15.0)\n    at makeError (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/utils/errors.ts:698:21)\n    at getBuiltinCallException (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/abi/abi-coder.ts:118:21)\n    at Function.getBuiltinCallException (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/abi/abi-coder.ts:235:16)\n    at JsonRpcProvider.getRpcError (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/providers/provider-jsonrpc.ts:1016:32)\n    at /Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/providers/provider-jsonrpc.ts:571:45\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)","timestamp":"2025-07-26T03:10:02.276Z","transaction":{"data":"0x70a08231000000000000000000000000747dc4a00d0efda9053a29e691c60d0bfc9fc180","from":"0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","to":"0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5"}}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T03:19:18.493Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T03:19:18.495Z"}
+{"level":"info","message":"RPC URL: https://mainnet.base.org/34e924dc24f4427796ab67d045a0dc1e","timestamp":"2025-07-26T03:19:18.496Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T03:19:18.549Z"}
+{"level":"info","message":"🧪 Testing Gauge service...","timestamp":"2025-07-26T03:19:18.555Z"}
+{"level":"info","message":"🔄 Initializing Aerodrome service...","timestamp":"2025-07-26T03:19:18.555Z"}
+{"level":"info","message":"✅ WETH-VIRTUAL Pool found: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T03:19:19.080Z"}
+{"level":"info","message":"🔄 Initializing Gauge service...","timestamp":"2025-07-26T03:19:19.081Z"}
+{"level":"info","message":"✅ Gauge found: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T03:19:19.418Z"}
+{"level":"info","message":"✅ Gauge service initialized successfully","timestamp":"2025-07-26T03:19:19.420Z"}
+{"level":"info","message":"Pool Address: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T03:19:19.421Z"}
+{"level":"info","message":"Gauge Address: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T03:19:19.421Z"}
+{"level":"info","message":"✅ Gauge total supply: 63569.654423287363890753 LP tokens","timestamp":"2025-07-26T03:19:19.752Z"}
+{"level":"info","message":"Agent LP Balance: 0.04614830642030241","timestamp":"2025-07-26T03:19:20.243Z"}
+{"level":"info","message":"Agent Staked LP: 0.0","timestamp":"2025-07-26T03:19:20.558Z"}
+{"level":"info","message":"✅ Gauge service test passed!","timestamp":"2025-07-26T03:19:20.558Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T03:37:06.200Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T03:37:06.203Z"}
+{"level":"info","message":"RPC URL: https://mainnet.base.org/34e924dc24f4427796ab67d045a0dc1e","timestamp":"2025-07-26T03:37:06.203Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T03:37:06.257Z"}
+{"level":"info","message":"💰 Enhanced Agent Balances:","timestamp":"2025-07-26T03:37:06.263Z"}
+{"level":"info","message":"🔄 Initializing LP Agent...","timestamp":"2025-07-26T03:37:06.263Z"}
+{"level":"info","message":"🔄 Initializing Aerodrome service...","timestamp":"2025-07-26T03:37:06.263Z"}
+{"level":"info","message":"✅ WETH-VIRTUAL Pool found: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T03:37:06.767Z"}
+{"level":"info","message":"🔄 Initializing Gauge service...","timestamp":"2025-07-26T03:37:06.767Z"}
+{"level":"info","message":"✅ Gauge found: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T03:37:07.145Z"}
+{"level":"info","message":"✅ Gauge service initialized successfully","timestamp":"2025-07-26T03:37:07.147Z"}
+{"level":"info","message":"✅ Gas balance sufficient: 0.009988313589147807 ETH","timestamp":"2025-07-26T03:37:07.492Z"}
+{"level":"info","message":"✅ LP Agent initialized successfully","timestamp":"2025-07-26T03:37:07.493Z"}
+{"level":"warn","message":"Rate limit hit for 0x4200000000000000000000000000000000000006, using fallback","timestamp":"2025-07-26T03:37:07.993Z"}
+{"level":"warn","message":"Rate limit hit for 0x21594b992F68495dD28d605834b58889d0a727c7, using fallback","timestamp":"2025-07-26T03:37:07.994Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T03:39:28.934Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T03:39:28.936Z"}
+{"level":"info","message":"RPC URL: https://mainnet.base.org/34e924dc24f4427796ab67d045a0dc1e","timestamp":"2025-07-26T03:39:28.936Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T03:39:28.991Z"}
+{"level":"info","message":"🥩 Staking existing LP tokens...","timestamp":"2025-07-26T03:39:28.996Z"}
+{"level":"info","message":"🔄 Initializing LP Agent...","timestamp":"2025-07-26T03:39:28.997Z"}
+{"level":"info","message":"🔄 Initializing Aerodrome service...","timestamp":"2025-07-26T03:39:28.997Z"}
+{"level":"info","message":"✅ WETH-VIRTUAL Pool found: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T03:39:29.474Z"}
+{"level":"info","message":"🔄 Initializing Gauge service...","timestamp":"2025-07-26T03:39:29.475Z"}
+{"level":"info","message":"✅ Gauge found: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T03:39:30.507Z"}
+{"level":"info","message":"✅ Gauge service initialized successfully","timestamp":"2025-07-26T03:39:30.509Z"}
+{"level":"info","message":"✅ Gas balance sufficient: 0.009988313589147807 ETH","timestamp":"2025-07-26T03:39:30.906Z"}
+{"level":"info","message":"✅ LP Agent initialized successfully","timestamp":"2025-07-26T03:39:30.906Z"}
+{"level":"warn","message":"Rate limit hit for 0x4200000000000000000000000000000000000006, using fallback","timestamp":"2025-07-26T03:39:31.359Z"}
+{"level":"warn","message":"Rate limit hit for 0x21594b992F68495dD28d605834b58889d0a727c7, using fallback","timestamp":"2025-07-26T03:39:31.360Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T04:45:21.971Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T04:45:21.973Z"}
+{"level":"info","message":"RPC URL: https://go.getblock.us/549cc6559ca1455396f57dc9a88a2fae","timestamp":"2025-07-26T04:45:21.974Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T04:45:22.027Z"}
+{"level":"info","message":"🧪 Testing Gauge service...","timestamp":"2025-07-26T04:45:22.033Z"}
+{"level":"info","message":"🔄 Initializing Aerodrome service...","timestamp":"2025-07-26T04:45:22.033Z"}
+{"level":"info","message":"✅ WETH-VIRTUAL Pool found: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T04:45:23.170Z"}
+{"level":"info","message":"🔄 Initializing Gauge service...","timestamp":"2025-07-26T04:45:23.172Z"}
+{"level":"info","message":"✅ Gauge found: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T04:45:23.880Z"}
+{"level":"info","message":"✅ Gauge service initialized successfully","timestamp":"2025-07-26T04:45:23.882Z"}
+{"level":"info","message":"Pool Address: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T04:45:23.883Z"}
+{"level":"info","message":"Gauge Address: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T04:45:23.884Z"}
+{"level":"info","message":"✅ Gauge total supply: 63569.989057415362680422 LP tokens","timestamp":"2025-07-26T04:45:24.825Z"}
+{"code":"SERVER_ERROR","info":{"requestUrl":"https://go.getblock.us/549cc6559ca1455396f57dc9a88a2fae","responseBody":"{\"id\":null,\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32000,\"message\":\"invalid request: json: cannot unmarshal array into Go value of type jsonrpc.Request\",\"data\":{\"error\":\"json: cannot unmarshal array into Go value of type jsonrpc.Request\",\"retryable\":\"false\"}}}","responseStatus":"400 Bad Request"},"level":"error","message":"Failed to get balance for 0x21594b992F68495dD28d605834b58889d0a727c7: server response 400 Bad Request (request={  }, response={  }, error=null, info={ \"requestUrl\": \"https://go.getblock.us/549cc6559ca1455396f57dc9a88a2fae\", \"responseBody\": \"{\\\"id\\\":null,\\\"jsonrpc\\\":\\\"2.0\\\",\\\"error\\\":{\\\"code\\\":-32000,\\\"message\\\":\\\"invalid request: json: cannot unmarshal array into Go value of type jsonrpc.Request\\\",\\\"data\\\":{\\\"error\\\":\\\"json: cannot unmarshal array into Go value of type jsonrpc.Request\\\",\\\"retryable\\\":\\\"false\\\"}}}\", \"responseStatus\": \"400 Bad Request\" }, code=SERVER_ERROR, version=6.15.0)","request":{},"response":{},"shortMessage":"server response 400 Bad Request","stack":"Error: server response 400 Bad Request (request={  }, response={  }, error=null, info={ \"requestUrl\": \"https://go.getblock.us/549cc6559ca1455396f57dc9a88a2fae\", \"responseBody\": \"{\\\"id\\\":null,\\\"jsonrpc\\\":\\\"2.0\\\",\\\"error\\\":{\\\"code\\\":-32000,\\\"message\\\":\\\"invalid request: json: cannot unmarshal array into Go value of type jsonrpc.Request\\\",\\\"data\\\":{\\\"error\\\":\\\"json: cannot unmarshal array into Go value of type jsonrpc.Request\\\",\\\"retryable\\\":\\\"false\\\"}}}\", \"responseStatus\": \"400 Bad Request\" }, code=SERVER_ERROR, version=6.15.0)\n    at makeError (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/utils/errors.ts:698:21)\n    at assert (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/utils/errors.ts:719:25)\n    at FetchResponse.assertOk (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/utils/fetch.ts:950:15)\n    at JsonRpcProvider._send (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/providers/provider-jsonrpc.ts:1272:18)\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)\n    at async /Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/providers/provider-jsonrpc.ts:545:40","timestamp":"2025-07-26T04:45:25.862Z"}
+{"code":"SERVER_ERROR","info":{"requestUrl":"https://go.getblock.us/549cc6559ca1455396f57dc9a88a2fae","responseBody":"{\"id\":null,\"jsonrpc\":\"2.0\",\"error\":{\"code\":-32000,\"message\":\"invalid request: json: cannot unmarshal array into Go value of type jsonrpc.Request\",\"data\":{\"error\":\"json: cannot unmarshal array into Go value of type jsonrpc.Request\",\"retryable\":\"false\"}}}","responseStatus":"400 Bad Request"},"level":"error","message":"❌ Gauge service test failed: server response 400 Bad Request (request={  }, response={  }, error=null, info={ \"requestUrl\": \"https://go.getblock.us/549cc6559ca1455396f57dc9a88a2fae\", \"responseBody\": \"{\\\"id\\\":null,\\\"jsonrpc\\\":\\\"2.0\\\",\\\"error\\\":{\\\"code\\\":-32000,\\\"message\\\":\\\"invalid request: json: cannot unmarshal array into Go value of type jsonrpc.Request\\\",\\\"data\\\":{\\\"error\\\":\\\"json: cannot unmarshal array into Go value of type jsonrpc.Request\\\",\\\"retryable\\\":\\\"false\\\"}}}\", \"responseStatus\": \"400 Bad Request\" }, code=SERVER_ERROR, version=6.15.0)","request":{},"response":{},"shortMessage":"server response 400 Bad Request","stack":"Error: server response 400 Bad Request (request={  }, response={  }, error=null, info={ \"requestUrl\": \"https://go.getblock.us/549cc6559ca1455396f57dc9a88a2fae\", \"responseBody\": \"{\\\"id\\\":null,\\\"jsonrpc\\\":\\\"2.0\\\",\\\"error\\\":{\\\"code\\\":-32000,\\\"message\\\":\\\"invalid request: json: cannot unmarshal array into Go value of type jsonrpc.Request\\\",\\\"data\\\":{\\\"error\\\":\\\"json: cannot unmarshal array into Go value of type jsonrpc.Request\\\",\\\"retryable\\\":\\\"false\\\"}}}\", \"responseStatus\": \"400 Bad Request\" }, code=SERVER_ERROR, version=6.15.0)\n    at makeError (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/utils/errors.ts:698:21)\n    at assert (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/utils/errors.ts:719:25)\n    at FetchResponse.assertOk (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/utils/fetch.ts:950:15)\n    at JsonRpcProvider._send (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/providers/provider-jsonrpc.ts:1272:18)\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)\n    at async /Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/providers/provider-jsonrpc.ts:545:40","timestamp":"2025-07-26T04:45:25.863Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T04:45:57.123Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T04:45:57.125Z"}
+{"level":"info","message":"RPC URL: https://mainnet.base.org/549cc6559ca1455396f57dc9a88a2fae","timestamp":"2025-07-26T04:45:57.125Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T04:45:57.177Z"}
+{"level":"info","message":"🧪 Testing Gauge service...","timestamp":"2025-07-26T04:45:57.182Z"}
+{"level":"info","message":"🔄 Initializing Aerodrome service...","timestamp":"2025-07-26T04:45:57.182Z"}
+{"level":"info","message":"✅ WETH-VIRTUAL Pool found: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T04:45:57.683Z"}
+{"level":"info","message":"🔄 Initializing Gauge service...","timestamp":"2025-07-26T04:45:57.684Z"}
+{"level":"info","message":"✅ Gauge found: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T04:45:58.032Z"}
+{"level":"info","message":"✅ Gauge service initialized successfully","timestamp":"2025-07-26T04:45:58.034Z"}
+{"level":"info","message":"Pool Address: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T04:45:58.035Z"}
+{"level":"info","message":"Gauge Address: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T04:45:58.035Z"}
+{"level":"info","message":"✅ Gauge total supply: 63569.989057415362680422 LP tokens","timestamp":"2025-07-26T04:45:58.399Z"}
+{"level":"info","message":"Agent LP Balance: 0.04614830642030241","timestamp":"2025-07-26T04:45:58.852Z"}
+{"action":"call","code":"CALL_EXCEPTION","data":null,"info":{"error":{"code":-32016,"message":"over rate limit"},"payload":{"id":10,"jsonrpc":"2.0","method":"eth_call","params":[{"data":"0x70a08231000000000000000000000000747dc4a00d0efda9053a29e691c60d0bfc9fc180","from":"0x747dc4a00d0efda9053a29e691c60d0bfc9fc180","to":"0xbd62cad65b49b4ad9c7aa9b8bdb89d63221f7af5"},"latest"]}},"invocation":null,"level":"error","message":"❌ Gauge service test failed: missing revert data (action=\"call\", data=null, reason=null, transaction={ \"data\": \"0x70a08231000000000000000000000000747dc4a00d0efda9053a29e691c60d0bfc9fc180\", \"from\": \"0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180\", \"to\": \"0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5\" }, invocation=null, revert=null, code=CALL_EXCEPTION, version=6.15.0)","reason":null,"revert":null,"shortMessage":"missing revert data","stack":"Error: missing revert data (action=\"call\", data=null, reason=null, transaction={ \"data\": \"0x70a08231000000000000000000000000747dc4a00d0efda9053a29e691c60d0bfc9fc180\", \"from\": \"0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180\", \"to\": \"0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5\" }, invocation=null, revert=null, code=CALL_EXCEPTION, version=6.15.0)\n    at makeError (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/utils/errors.ts:698:21)\n    at getBuiltinCallException (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/abi/abi-coder.ts:118:21)\n    at Function.getBuiltinCallException (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/abi/abi-coder.ts:235:16)\n    at JsonRpcProvider.getRpcError (/Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/providers/provider-jsonrpc.ts:1016:32)\n    at /Users/surbhiaudichya/Work/aerodrome-lp-agent/node_modules/ethers/src.ts/providers/provider-jsonrpc.ts:571:45\n    at processTicksAndRejections (node:internal/process/task_queues:96:5)","timestamp":"2025-07-26T04:45:59.832Z","transaction":{"data":"0x70a08231000000000000000000000000747dc4a00d0efda9053a29e691c60d0bfc9fc180","from":"0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","to":"0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5"}}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T04:51:52.558Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T04:51:52.561Z"}
+{"level":"info","message":"RPC URL: https://mainnet.base.org/549cc6559ca1455396f57dc9a88a2fae","timestamp":"2025-07-26T04:51:52.561Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T04:51:52.615Z"}
+{"level":"info","message":"💰 Enhanced Agent Balances:","timestamp":"2025-07-26T04:51:52.620Z"}
+{"level":"info","message":"🔄 Initializing LP Agent...","timestamp":"2025-07-26T04:51:52.620Z"}
+{"level":"info","message":"🔄 Initializing Aerodrome service...","timestamp":"2025-07-26T04:51:52.621Z"}
+{"level":"info","message":"✅ WETH-VIRTUAL Pool found: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T04:51:53.114Z"}
+{"level":"info","message":"🔄 Initializing Gauge service...","timestamp":"2025-07-26T04:51:53.115Z"}
+{"level":"info","message":"✅ Gauge found: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T04:51:53.456Z"}
+{"level":"info","message":"✅ Gauge service initialized successfully","timestamp":"2025-07-26T04:51:53.459Z"}
+{"level":"info","message":"✅ Gas balance sufficient: 0.009988313589147807 ETH","timestamp":"2025-07-26T04:51:53.793Z"}
+{"level":"info","message":"✅ LP Agent initialized successfully","timestamp":"2025-07-26T04:51:53.794Z"}
+{"level":"warn","message":"Rate limit hit for 0x4200000000000000000000000000000000000006, using fallback","timestamp":"2025-07-26T04:51:54.273Z"}
+{"level":"warn","message":"Rate limit hit for 0x21594b992F68495dD28d605834b58889d0a727c7, using fallback","timestamp":"2025-07-26T04:51:54.273Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T04:52:44.090Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T04:52:44.093Z"}
+{"level":"info","message":"RPC URL: https://mainnet.base.org/549cc6559ca1455396f57dc9a88a2fae","timestamp":"2025-07-26T04:52:44.093Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T04:52:44.147Z"}
+{"level":"info","message":"🥩 Staking existing LP tokens...","timestamp":"2025-07-26T04:52:44.152Z"}
+{"level":"info","message":"🔄 Initializing LP Agent...","timestamp":"2025-07-26T04:52:44.152Z"}
+{"level":"info","message":"🔄 Initializing Aerodrome service...","timestamp":"2025-07-26T04:52:44.153Z"}
+{"level":"info","message":"✅ WETH-VIRTUAL Pool found: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T04:52:44.692Z"}
+{"level":"info","message":"🔄 Initializing Gauge service...","timestamp":"2025-07-26T04:52:44.693Z"}
+{"level":"info","message":"✅ Gauge found: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T04:52:45.037Z"}
+{"level":"info","message":"✅ Gauge service initialized successfully","timestamp":"2025-07-26T04:52:45.039Z"}
+{"level":"info","message":"✅ Gas balance sufficient: 0.009988313589147807 ETH","timestamp":"2025-07-26T04:52:45.365Z"}
+{"level":"info","message":"✅ LP Agent initialized successfully","timestamp":"2025-07-26T04:52:45.365Z"}
+{"level":"warn","message":"Rate limit hit for 0x4200000000000000000000000000000000000006, using fallback","timestamp":"2025-07-26T04:52:45.884Z"}
+{"level":"warn","message":"Rate limit hit for 0x21594b992F68495dD28d605834b58889d0a727c7, using fallback","timestamp":"2025-07-26T04:52:45.884Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T04:57:43.360Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T04:57:43.363Z"}
+{"level":"info","message":"RPC URL: https://mainnet.base.org/549cc6559ca1455396f57dc9a88a2fae","timestamp":"2025-07-26T04:57:43.363Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T04:57:43.414Z"}
+{"level":"info","message":"🔍 Checking LP balance directly...","timestamp":"2025-07-26T04:57:43.419Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T04:59:55.965Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T04:59:55.970Z"}
+{"level":"info","message":"RPC URL: https://mainnet.base.org/549cc6559ca1455396f57dc9a88a2fae","timestamp":"2025-07-26T04:59:55.970Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T04:59:56.028Z"}
+{"level":"info","message":"🔍 Checking staked balance directly...","timestamp":"2025-07-26T04:59:56.034Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T05:15:43.132Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T05:15:43.134Z"}
+{"level":"info","message":"RPC URL: https://mainnet.base.org/549cc6559ca1455396f57dc9a88a2fae","timestamp":"2025-07-26T05:15:43.134Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T05:15:43.191Z"}
+{"level":"info","message":"🥩 Staking LP tokens directly (bypassing rate limits)...","timestamp":"2025-07-26T05:15:43.197Z"}
+{"level":"info","message":"🚀 Starting Aerodrome LP Agent...","timestamp":"2025-07-26T05:23:43.910Z"}
+{"level":"info","message":"Chain ID: 8453","timestamp":"2025-07-26T05:23:43.912Z"}
+{"level":"info","message":"RPC URL: https://mainnet.base.org/549cc6559ca1455396f57dc9a88a2fae","timestamp":"2025-07-26T05:23:43.913Z"}
+{"level":"info","message":"Agent wallet initialized: 0x747Dc4A00d0eFDA9053a29e691c60D0BfC9fc180","timestamp":"2025-07-26T05:23:43.962Z"}
+{"level":"info","message":"📄 Generating position receipt for 0x65655D5d18F41775156CdFb53cC5710E13380070...","timestamp":"2025-07-26T05:23:43.969Z"}
+{"level":"info","message":"🔄 Initializing LP Agent...","timestamp":"2025-07-26T05:23:43.969Z"}
+{"level":"info","message":"🔄 Initializing Aerodrome service...","timestamp":"2025-07-26T05:23:43.970Z"}
+{"level":"info","message":"✅ WETH-VIRTUAL Pool found: 0x21594b992F68495dD28d605834b58889d0a727c7","timestamp":"2025-07-26T05:23:44.642Z"}
+{"level":"info","message":"🔄 Initializing Gauge service...","timestamp":"2025-07-26T05:23:44.643Z"}
+{"level":"info","message":"✅ Gauge found: 0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5","timestamp":"2025-07-26T05:23:45.188Z"}
+{"level":"info","message":"✅ Gauge service initialized successfully","timestamp":"2025-07-26T05:23:45.191Z"}
+{"level":"info","message":"✅ Gas balance sufficient: 0.009987064057000091 ETH","timestamp":"2025-07-26T05:23:45.513Z"}
+{"level":"info","message":"✅ LP Agent initialized successfully","timestamp":"2025-07-26T05:23:45.513Z"}

@@ -7,6 +7,7 @@ import { TokenService } from "./services/TokenService";
 import { AerodromeService } from "./services/AerodromeService";
 import { LPAgent } from "./services/LPAgent";
 import { parseUnits } from "./utils/helpers";
+import { GaugeService } from "./services/GaugeService";
 
 // Load environment variables
 dotenv.config();
@@ -118,6 +119,10 @@ async function main() {
         await completeFullDeposit(lpAgent, args[1], args[2]);
         break;
 
+      case "test-gauge":
+        await testGaugeService(aerodromeService, tokenService, walletService);
+        break;
+
       case "balances":
         await showTokenBalances(tokenService);
         break;
@@ -129,21 +134,57 @@ async function main() {
       case "status":
         await showAgentStatus(walletService, tokenService, aerodromeService);
         break;
+      case "stake-lp":
+        await stakeExistingLP(lpAgent);
+        break;
+
+      case "position-receipt":
+        if (args.length < 2) {
+          console.error("Usage: npm run dev position-receipt <userAddress>");
+          console.error("Example: npm run dev position-receipt 0x65655D5d18F41775156CdFb53cC5710E13380070");
+          process.exit(1);
+        }
+        await showPositionReceipt(lpAgent, args[1]);
+        break;
+
+      case "enhanced-balances":
+        await showEnhancedBalances(lpAgent);
+        break;
+
+      case "check-lp-direct":
+        await checkLPBalanceDirect(walletService);
+        break;
+      case "check-staked-direct":
+        await checkStakedBalanceDirect(walletService);
+        break;
+      case "stake-lp-direct":
+        await stakeLPTokensDirect(walletService);
+        break;
+      case "position-receipt":
+        if (args.length < 2) {
+          console.error("Usage: npm run dev position-receipt <userAddress>");
+          console.error("Example: npm run dev position-receipt 0x65655D5d18F41775156CdFb53cC5710E13380070");
+          process.exit(1);
+        }
+        await generatePositionReceipt(walletService, args[1]);
+        break;
 
       default:
         logger.info("Available commands:");
         logger.info("  npm run dev test - Test wallet service");
         logger.info("  npm run dev test-tokens - Test token service");
         logger.info("  npm run dev test-aerodrome - Test Aerodrome connection");
+        logger.info("  npm run dev test-gauge - Test Gauge connection");
         logger.info("  npm run dev test-lp - Test LP Agent");
         logger.info("  npm run dev simulate <amount> - Simulate deposit");
         logger.info("  npm run dev check <userAddr> <amount> - Check if user can deposit");
         logger.info("  npm run dev deposit <userAddr> <amount> - 🚨 EXECUTE REAL DEPOSIT");
-        logger.info("  npm run dev approve <token> <amount> - Approve agent to spend tokens");
-        logger.info("  npm run dev refund <userAddr> - Refund USDC from agent to user");
-        logger.info("  npm run dev finish-lp - Complete LP addition with existing tokens");
-        logger.info("  npm run dev execute-lp - Execute LP addition (bypasses rate limits)");
-        logger.info("  npm run dev complete-deposit <userAddr> <amount> - Complete FULL deposit flow");
+        logger.info("");
+        logger.info("NEW STAKING COMMANDS:");
+        logger.info("  npm run dev stake-lp - 🥩 Stake existing LP tokens");
+        logger.info("  npm run dev position-receipt <userAddr> - 📄 Generate position receipt");
+        logger.info("  npm run dev enhanced-balances - Show all balances including staked");
+        logger.info("");
         logger.info("  npm run dev balances - Show token balances");
         logger.info("  npm run dev agent-balances - Show agent balances");
         logger.info("  npm run dev status - Check full agent status");
@@ -658,7 +699,444 @@ async function showAgentStatus(
     console.log("⚠️  Warning: Low ETH balance for gas fees");
   }
 }
+async function testGaugeService(
+  aerodromeService: AerodromeService,
+  tokenService: TokenService,
+  walletService: WalletService,
+) {
+  logger.info("🧪 Testing Gauge service...");
 
+  try {
+    // Initialize Aerodrome service first
+    await aerodromeService.initialize();
+
+    // Initialize Gauge service
+    const gaugeService = new GaugeService(walletService);
+    await gaugeService.initialize(aerodromeService.getPoolAddress());
+
+    logger.info(`Pool Address: ${aerodromeService.getPoolAddress()}`);
+    logger.info(`Gauge Address: ${gaugeService.getGaugeAddress()}`);
+
+    // Test gauge connection
+    const gaugeTest = await gaugeService.testGaugeConnection();
+
+    // Check if agent has any LP tokens to stake
+    const lpBalance = await tokenService.getBalance(aerodromeService.getPoolAddress());
+    logger.info(`Agent LP Balance: ${lpBalance.balance}`);
+
+    // Check if agent has any staked LP tokens
+    const stakedBalance = await gaugeService.getStakedBalance();
+    logger.info(`Agent Staked LP: ${ethers.formatEther(stakedBalance)}`);
+
+    if (gaugeTest) {
+      logger.info("✅ Gauge service test passed!");
+    } else {
+      logger.error("❌ Gauge connection test failed");
+    }
+  } catch (error) {
+    logger.error("❌ Gauge service test failed:", error);
+  }
+}
+
+async function stakeExistingLP(lpAgent: LPAgent) {
+  logger.info("🥩 Staking existing LP tokens...");
+
+  try {
+    await lpAgent.initialize();
+
+    // Check current balances first
+    const balances = await lpAgent.getAgentBalances();
+    console.log("\n📊 Current Balances:");
+    console.log(`  LP Tokens (unstaked): ${balances.lpTokens}`);
+    console.log(`  LP Tokens (staked): ${balances.stakedLP}`);
+
+    if (parseFloat(balances.lpTokens) === 0) {
+      console.log("❌ No LP tokens to stake");
+      return;
+    }
+
+    console.log("\n⚠️  WARNING: This will stake your LP tokens!");
+    console.log(`Will stake: ${balances.lpTokens} LP tokens`);
+    console.log("Executing in 3 seconds... Press Ctrl+C to cancel");
+
+    for (let i = 3; i > 0; i--) {
+      console.log(`${i}...`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    const result = await lpAgent.stakeExistingLP();
+
+    console.log("\n🎉 Staking Results:");
+    console.log("===================");
+    console.log(`✅ Success: ${result.success}`);
+    console.log(`🥩 Staked Amount: ${result.stakedAmount}`);
+
+    if (result.txHash) {
+      console.log(`📝 Transaction: https://basescan.org/tx/${result.txHash}`);
+    }
+
+    if (!result.success) {
+      console.log(`❌ Error: ${result.error}`);
+    }
+
+    // Show updated balances
+    const newBalances = await lpAgent.getAgentBalances();
+    console.log("\n📊 Updated Balances:");
+    console.log(`  LP Tokens (unstaked): ${newBalances.lpTokens}`);
+    console.log(`  LP Tokens (staked): ${newBalances.stakedLP}`);
+  } catch (error) {
+    logger.error("❌ Staking failed:", error);
+  }
+}
+
+async function showPositionReceipt(lpAgent: LPAgent, userAddress: string) {
+  logger.info(`📄 Generating position receipt for ${userAddress}...`);
+
+  try {
+    await lpAgent.initialize();
+
+    const receipt = await lpAgent.getPositionReceipt(userAddress);
+
+    console.log("\n📄 POSITION RECEIPT");
+    console.log("===================");
+    console.log(`User Address: ${receipt.userAddress}`);
+    console.log(`Agent Address: ${receipt.agentAddress}`);
+    console.log(`Pool Address: ${receipt.poolAddress}`);
+    console.log(`Gauge Address: ${receipt.gaugeAddress}`);
+    console.log("");
+    console.log("LP Token Position:");
+    console.log(`  Staked LP: ${receipt.stakedLPAmount}`);
+    console.log(`  Unstaked LP: ${receipt.unstakedLPAmount}`);
+    console.log(`  Total LP Value: ${receipt.totalLPValue}`);
+    console.log("");
+    console.log(`Generated: ${receipt.timestamp}`);
+    console.log("");
+    console.log("🔗 View on BaseScan:");
+    console.log(`  Pool: https://basescan.org/address/${receipt.poolAddress}`);
+    console.log(`  Gauge: https://basescan.org/address/${receipt.gaugeAddress}`);
+  } catch (error) {
+    logger.error("❌ Failed to generate position receipt:", error);
+  }
+}
+
+async function showEnhancedBalances(lpAgent: LPAgent) {
+  logger.info("💰 Enhanced Agent Balances:");
+
+  try {
+    await lpAgent.initialize();
+    const balances = await lpAgent.getAgentBalances();
+
+    console.log("========================");
+    console.log(`ETH: ${balances.eth}`);
+    console.log(`USDC: ${balances.usdc}`);
+    console.log(`WETH: ${balances.weth}`);
+    console.log(`LP Tokens (unstaked): ${balances.lpTokens}`);
+    console.log(`LP Tokens (staked): ${balances.stakedLP}`);
+    console.log("");
+
+    const totalLP = parseFloat(balances.lpTokens) + parseFloat(balances.stakedLP);
+    console.log(`Total LP Position: ${totalLP}`);
+  } catch (error) {
+    logger.error("❌ Failed to get enhanced balances:", error);
+  }
+}
+
+async function checkLPBalanceDirect(walletService: WalletService) {
+  logger.info("🔍 Checking LP balance directly...");
+
+  try {
+    const agentAddress = walletService.getAgentWallet().address;
+    const poolAddress = "0x21594b992F68495dD28d605834b58889d0a727c7";
+
+    console.log(`Agent Address: ${agentAddress}`);
+    console.log(`Pool Address: ${poolAddress}`);
+    console.log("");
+
+    // Create LP token contract directly
+    const lpContract = new ethers.Contract(
+      poolAddress,
+      [
+        "function balanceOf(address owner) view returns (uint256)",
+        "function totalSupply() view returns (uint256)",
+        "function symbol() view returns (string)",
+      ],
+      walletService.getProvider(),
+    );
+
+    console.log("Checking LP token info...");
+
+    // Add delays between calls
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const symbol = await lpContract.symbol();
+    console.log(`LP Token Symbol: ${symbol}`);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const totalSupply = await lpContract.totalSupply();
+    console.log(`Total LP Supply: ${ethers.formatEther(totalSupply)}`);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const balance = await lpContract.balanceOf(agentAddress);
+    const balanceFormatted = ethers.formatEther(balance);
+
+    console.log("");
+    console.log("🎯 RESULTS:");
+    console.log(`LP Balance (raw): ${balance.toString()}`);
+    console.log(`LP Balance (formatted): ${balanceFormatted}`);
+
+    if (balance > 0n) {
+      console.log("✅ You have LP tokens to stake!");
+    } else {
+      console.log("❌ No LP tokens found");
+      console.log("");
+      console.log("🔍 Possible reasons:");
+      console.log("1. LP tokens already staked in gauge");
+      console.log("2. LP tokens in different address");
+      console.log("3. Previous transactions failed");
+      console.log("");
+      console.log("Check your wallet on BaseScan:");
+      console.log(`https://basescan.org/address/${agentAddress}`);
+    }
+  } catch (error: any) {
+    logger.error("Direct balance check failed:", error);
+
+    if (error?.info?.error?.message?.includes("rate limit")) {
+      console.log("");
+      console.log("🚨 RATE LIMIT ISSUE!");
+      console.log("Your RPC provider is limiting requests.");
+      console.log("");
+      console.log("Solutions:");
+      console.log("1. Wait 1-2 minutes and try again");
+      console.log("2. Use a different RPC endpoint");
+      console.log("3. Check balance manually on BaseScan");
+    }
+  }
+}
+async function checkStakedBalanceDirect(walletService: WalletService) {
+  logger.info("🔍 Checking staked balance directly...");
+
+  try {
+    const agentAddress = walletService.getAgentWallet().address;
+    const gaugeAddress = "0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5";
+
+    console.log(`Agent Address: ${agentAddress}`);
+    console.log(`Gauge Address: ${gaugeAddress}`);
+    console.log("");
+
+    // Create gauge contract directly
+    const gaugeContract = new ethers.Contract(
+      gaugeAddress,
+      ["function balanceOf(address owner) view returns (uint256)", "function totalSupply() view returns (uint256)"],
+      walletService.getProvider(),
+    );
+
+    console.log("Checking gauge info...");
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const totalStaked = await gaugeContract.totalSupply();
+    console.log(`Total Staked in Gauge: ${ethers.formatEther(totalStaked)}`);
+
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const stakedBalance = await gaugeContract.balanceOf(agentAddress);
+    const stakedFormatted = ethers.formatEther(stakedBalance);
+
+    console.log("");
+    console.log("🎯 RESULTS:");
+    console.log(`Staked Balance (raw): ${stakedBalance.toString()}`);
+    console.log(`Staked Balance (formatted): ${stakedFormatted}`);
+
+    if (stakedBalance > 0n) {
+      console.log("✅ You already have staked LP tokens!");
+      console.log("🎉 Steps 5 & 6 might already be complete!");
+    } else {
+      console.log("❌ No staked LP tokens found");
+    }
+  } catch (error: any) {
+    logger.error("Direct staked balance check failed:", error);
+
+    if (error?.info?.error?.message?.includes("rate limit")) {
+      console.log("🚨 Rate limit hit - wait and try again");
+    }
+  }
+}
+
+async function stakeLPTokensDirect(walletService: WalletService) {
+  logger.info("🥩 Staking LP tokens directly (bypassing rate limits)...");
+
+  try {
+    const agentAddress = walletService.getAgentWallet().address;
+    const poolAddress = "0x21594b992F68495dD28d605834b58889d0a727c7";
+    const gaugeAddress = "0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5";
+
+    // Step 1: Get LP token balance directly
+    const lpContract = new ethers.Contract(
+      poolAddress,
+      [
+        "function balanceOf(address owner) view returns (uint256)",
+        "function approve(address spender, uint256 amount) returns (bool)",
+        "function allowance(address owner, address spender) view returns (uint256)",
+      ],
+      walletService.getAgentWallet(), // Connected wallet for transactions
+    );
+
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const lpBalance = await lpContract.balanceOf(agentAddress);
+    const lpBalanceFormatted = ethers.formatEther(lpBalance);
+
+    console.log(`\n📊 Current LP Balance: ${lpBalanceFormatted}`);
+
+    if (lpBalance === 0n) {
+      console.log("❌ No LP tokens to stake");
+      return;
+    }
+
+    console.log("\n⚠️  WARNING: This will stake your LP tokens!");
+    console.log(`Will stake: ${lpBalanceFormatted} LP tokens`);
+    console.log(`Pool: ${poolAddress}`);
+    console.log(`Gauge: ${gaugeAddress}`);
+    console.log("\nExecuting in 5 seconds... Press Ctrl+C to cancel");
+
+    for (let i = 5; i > 0; i--) {
+      console.log(`${i}...`);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+
+    // Step 2: Check and approve LP tokens for gauge
+    console.log("🔓 Step 1: Checking approval...");
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const currentAllowance = await lpContract.allowance(agentAddress, gaugeAddress);
+
+    let approvalTx = null;
+    if (currentAllowance < lpBalance) {
+      console.log("🔓 Step 2: Approving LP tokens for gauge...");
+
+      // Reset allowance to 0 first if needed
+      if (currentAllowance > 0n) {
+        const resetTx = await lpContract.approve(gaugeAddress, 0n);
+        await resetTx.wait();
+        console.log("  Reset allowance to 0");
+      }
+
+      const approveTx = await lpContract.approve(gaugeAddress, lpBalance);
+      const approvalReceipt = await approveTx.wait();
+      approvalTx = approvalReceipt.hash;
+      console.log(`  ✅ Approval tx: https://basescan.org/tx/${approvalTx}`);
+    } else {
+      console.log("  ✅ Already approved");
+    }
+
+    // Step 3: Stake LP tokens in gauge
+    console.log("🥩 Step 3: Staking LP tokens in gauge...");
+    const gaugeContract = new ethers.Contract(
+      gaugeAddress,
+      ["function deposit(uint256 amount)", "function balanceOf(address account) view returns (uint256)"],
+      walletService.getAgentWallet(),
+    );
+
+    const stakeTx = await gaugeContract.deposit(lpBalance);
+    const stakeReceipt = await stakeTx.wait();
+
+    console.log("\n🎉 STAKING COMPLETE!");
+    console.log("====================");
+    console.log(`✅ Success: true`);
+    console.log(`🥩 Staked Amount: ${lpBalanceFormatted}`);
+    if (approvalTx) {
+      console.log(`📝 Approval Tx: https://basescan.org/tx/${approvalTx}`);
+    }
+    console.log(`📝 Staking Tx: https://basescan.org/tx/${stakeReceipt.hash}`);
+
+    // Step 4: Verify staking worked
+    await new Promise(resolve => setTimeout(resolve, 500));
+    const newStakedBalance = await gaugeContract.balanceOf(agentAddress);
+    const newStakedFormatted = ethers.formatEther(newStakedBalance);
+
+    console.log(`\n📊 New Staked Balance: ${newStakedFormatted}`);
+
+    if (newStakedBalance > 0n) {
+      console.log("🎯 STEP 5 COMPLETE: LP tokens are now staked and earning rewards!");
+    }
+  } catch (error: any) {
+    logger.error("❌ Direct staking failed:", error);
+
+    if (error?.info?.error?.message?.includes("rate limit")) {
+      console.log("\n🚨 Rate limit hit. Wait 2 minutes and try again.");
+    }
+  }
+}
+async function generatePositionReceipt(walletService: WalletService, userAddress: string) {
+  logger.info(`📄 Generating position receipt for ${userAddress}...`);
+
+  try {
+    const agentAddress = walletService.getAgentWallet().address;
+    const poolAddress = "0x21594b992F68495dD28d605834b58889d0a727c7";
+    const gaugeAddress = "0xBD62Cad65b49b4Ad9C7aa9b8bDB89d63221F7af5";
+
+    // Get staked balance
+    const gaugeContract = new ethers.Contract(
+      gaugeAddress,
+      ["function balanceOf(address account) view returns (uint256)"],
+      walletService.getProvider(),
+    );
+
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const stakedBalanceWei = await gaugeContract.balanceOf(agentAddress);
+    const stakedBalance = ethers.formatEther(stakedBalanceWei);
+
+    // Get unstaked balance
+    const lpContract = new ethers.Contract(
+      poolAddress,
+      ["function balanceOf(address owner) view returns (uint256)"],
+      walletService.getProvider(),
+    );
+
+    await new Promise(resolve => setTimeout(resolve, 300));
+    const unstakedBalanceWei = await lpContract.balanceOf(agentAddress);
+    const unstakedBalance = ethers.formatEther(unstakedBalanceWei);
+
+    const totalLPValue = (parseFloat(stakedBalance) + parseFloat(unstakedBalance)).toString();
+
+    console.log("\n📄 AERODROME LP POSITION RECEIPT");
+    console.log("==================================");
+    console.log(`Generated: ${new Date().toISOString()}`);
+    console.log("");
+    console.log("🔗 Addresses:");
+    console.log(`  User Address: ${userAddress}`);
+    console.log(`  Agent Address: ${agentAddress}`);
+    console.log(`  Pool Contract: ${poolAddress}`);
+    console.log(`  Gauge Contract: ${gaugeAddress}`);
+    console.log("");
+    console.log("💰 LP Token Position:");
+    console.log(`  Staked LP (earning rewards): ${stakedBalance}`);
+    console.log(`  Unstaked LP: ${unstakedBalance}`);
+    console.log(`  Total LP Value: ${totalLPValue}`);
+    console.log("");
+    console.log("🏊 Pool Information:");
+    console.log(`  Pair: WETH-VIRTUAL`);
+    console.log(`  Type: Volatile (v2)`);
+    console.log(`  Platform: Aerodrome Finance`);
+    console.log("");
+    console.log("🎁 Rewards:");
+    console.log(`  Status: ${parseFloat(stakedBalance) > 0 ? "✅ Earning AERO rewards" : "❌ Not earning rewards"}`);
+    console.log(`  Frequency: Continuous (claim anytime)`);
+    console.log("");
+    console.log("🔗 BaseScan Links:");
+    console.log(`  Agent Wallet: https://basescan.org/address/${agentAddress}`);
+    console.log(`  LP Token: https://basescan.org/address/${poolAddress}`);
+    console.log(`  Gauge: https://basescan.org/address/${gaugeAddress}`);
+    console.log("");
+    console.log("🚀 Automation Summary:");
+    console.log("  ✅ USDC → WETH + VIRTUAL swaps");
+    console.log("  ✅ Liquidity provision automated");
+    console.log("  ✅ LP token staking automated");
+    console.log("  ✅ Rewards earning activated");
+    console.log("");
+    console.log("📱 Next Steps:");
+    console.log("  • LP tokens are now earning AERO rewards");
+    console.log("  • Use withdrawal flow when ready to exit");
+    console.log("  • Monitor position on Aerodrome.finance");
+  } catch (error) {
+    logger.error("❌ Failed to generate position receipt:", error);
+  }
+}
 // Run the main function
 if (require.main === module) {
   main();
