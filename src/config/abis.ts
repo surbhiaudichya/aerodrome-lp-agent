@@ -13,10 +13,10 @@ export const ABIS = {
 
   // Aerodrome Router - for swaps and liquidity
   AERODROME_ROUTER: [
-    "function swapExactTokensForTokens(uint amountIn, uint amountOutMin, tuple(address from, address to, bool stable)[] routes, address to, uint deadline) returns (uint[] amounts)",
-    "function getAmountsOut(uint amountIn, tuple(address from, address to, bool stable)[] routes) view returns (uint[] amounts)",
-    "function addLiquidity(address tokenA, address tokenB, bool stable, uint amountADesired, uint amountBDesired, uint amountAMin, uint amountBMin, address to, uint deadline) returns (uint amountA, uint amountB, uint liquidity)",
+    "function getAmountsOut(uint amountIn, tuple(address from, address to, bool stable, address factory)[] routes) view returns (uint[] amounts)",
     "function quoteAddLiquidity(address tokenA, address tokenB, bool stable, uint amountADesired, uint amountBDesired) view returns (uint amountA, uint amountB, uint liquidity)",
+    "function swapExactTokensForTokens(uint amountIn, uint amountOutMin, tuple(address from, address to, bool stable, address factory)[] routes, address to, uint deadline) returns (uint[] amounts)",
+    "function addLiquidity(address tokenA, address tokenB, bool stable, uint amountADesired, uint amountBDesired, uint amountAMin, uint amountBMin, address to, uint deadline) returns (uint amountA, uint amountB, uint liquidity)",
   ],
 
   // Aerodrome Factory - to get pool addresses

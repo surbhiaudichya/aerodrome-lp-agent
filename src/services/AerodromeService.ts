@@ -4,6 +4,7 @@ import { CONTRACTS } from "../config/contracts";
 import { ABIS } from "../config/abis";
 import { SwapRoute } from "../types";
 import { logger } from "../utils/logger";
+import { sleep } from "../utils/helpers";
 
 export class AerodromeService {
   private walletService: WalletService;
@@ -81,6 +82,7 @@ export class AerodromeService {
           from: CONTRACTS.USDC,
           to: CONTRACTS.WETH,
           stable: false,
+          factory: CONTRACTS.AERODROME_FACTORY,
         },
       ];
 
@@ -142,14 +144,12 @@ export class AerodromeService {
     slippage: number = 0.5,
     deadline?: number,
   ): Promise<{ txHash: string; liquidity: bigint }> {
-    const { calculateMinAmount, calculateDeadline } = await import("../utils/helpers");
+    const { calculateDeadline } = await import("../utils/helpers");
 
     try {
-      // For small amounts, use much more generous slippage protection
-      // Or set to 0 to accept any ratio the pool provides
-      const amountAMin = 0n; // Accept any amount - pools rebalance constantly
-      const amountBMin = 0n; // Accept any amount - safer for small LPs
-
+      // Accept any amount - pools rebalance constantly
+      const amountAMin = 0n;
+      const amountBMin = 0n;
       const liquidityDeadline = deadline || calculateDeadline();
 
       logger.info(`Adding liquidity: ${amountADesired.toString()} + ${amountBDesired.toString()}`);
@@ -170,23 +170,45 @@ export class AerodromeService {
       const receipt = await tx.wait();
       logger.info(`✅ Add liquidity successful: ${receipt.hash}`);
 
-      // Try to extract liquidity amount from logs
-      let liquidity = 0n;
+      // ✅ NEW APPROACH: Get actual LP balance from contract
+      logger.info("🔍 Getting actual LP balance from contract...");
+
+      // Wait a moment for transaction to settle
+      await sleep(1000);
+
+      // Get real LP token balance from the pool contract
+      const lpContract = new ethers.Contract(
+        this.poolAddress,
+        ["function balanceOf(address owner) view returns (uint256)"],
+        this.walletService.getProvider(),
+      );
+
+      await sleep(200); // Rate limit protection
+      const actualLPBalance = await lpContract.balanceOf(to);
+
+      logger.info(`📊 Actual LP balance: ${ethers.formatEther(actualLPBalance)} LP tokens`);
+
+      // ❌ OLD APPROACH (for comparison - keeping commented)
+      /*
+      // BROKEN: Try to extract liquidity amount from logs
+      let liquidityFromLogs = 0n;
       for (const log of receipt.logs) {
         try {
           // Look for Transfer event to LP token contract (mint)
           if (log.address.toLowerCase() === this.poolAddress.toLowerCase()) {
             const decoded = ethers.AbiCoder.defaultAbiCoder().decode(["uint256"], log.data);
-            if (decoded[0] > liquidity) {
-              liquidity = decoded[0];
+            if (decoded[0] > liquidityFromLogs) {
+              liquidityFromLogs = decoded[0];
             }
           }
         } catch (e) {
           // Ignore decoding errors
         }
       }
+      logger.info(`🔍 Log parsing would have returned: ${ethers.formatEther(liquidityFromLogs)} (WRONG!)`);
+      */
 
-      return { txHash: receipt.hash, liquidity };
+      return { txHash: receipt.hash, liquidity: actualLPBalance };
     } catch (error) {
       logger.error("❌ Add liquidity failed:", error);
       throw error;

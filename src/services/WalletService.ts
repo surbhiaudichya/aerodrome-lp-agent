@@ -8,7 +8,6 @@ export class WalletService {
   constructor(rpcUrl: string, privateKey: string) {
     this.provider = new ethers.JsonRpcProvider(rpcUrl);
     this.agentWallet = new ethers.Wallet(privateKey, this.provider);
-
     logger.info(`Agent wallet initialized: ${this.agentWallet.address}`);
   }
 
@@ -20,27 +19,15 @@ export class WalletService {
     return this.agentWallet;
   }
 
-  async getAgentBalance(): Promise<string> {
-    const balance = await this.provider.getBalance(this.agentWallet.address);
-    return ethers.formatEther(balance);
-  }
-
   async ensureGasBalance(requiredEth: string = "0.01"): Promise<void> {
-    const balance = await this.getAgentBalance();
+    const balance = await this.provider.getBalance(this.agentWallet.address);
+    const balanceEth = ethers.formatEther(balance);
     const required = parseFloat(requiredEth);
 
-    if (parseFloat(balance) < required) {
-      throw new Error(`Insufficient gas balance. Required: ${requiredEth} ETH, Current: ${balance} ETH`);
+    if (parseFloat(balanceEth) < required) {
+      throw new Error(`Insufficient gas balance. Required: ${requiredEth} ETH, Current: ${balanceEth} ETH`);
     }
 
-    logger.info(`✅ Gas balance sufficient: ${balance} ETH`);
-  }
-
-  async getNetworkInfo(): Promise<{ chainId: number; networkName: string }> {
-    const network = await this.provider.getNetwork();
-    return {
-      chainId: Number(network.chainId),
-      networkName: network.name,
-    };
+    logger.info(`✅ Gas balance sufficient: ${balanceEth} ETH`);
   }
 }

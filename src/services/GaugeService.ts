@@ -31,8 +31,6 @@ export class GaugeService {
       }
 
       logger.info(`✅ Gauge found: ${gaugeAddress}`);
-
-      // Update contracts config
       CONTRACTS.WETH_VIRTUAL_GAUGE = gaugeAddress;
 
       // Initialize gauge contract
@@ -64,44 +62,21 @@ export class GaugeService {
     }
   }
 
-  async getStakedBalance(account?: string): Promise<bigint> {
+  async getStakedBalance(): Promise<bigint> {
     if (!this.gaugeContract) {
       throw new Error("Gauge service not initialized");
     }
 
     try {
-      // Add delay to avoid rate limits
-      await new Promise(resolve => setTimeout(resolve, 200));
-
-      const address = account || this.walletService.getAgentWallet().address;
+      const address = this.walletService.getAgentWallet().address;
       return await this.gaugeContract.balanceOf(address);
-    } catch (error: any) {
-      if (error?.info?.error?.message?.includes("rate limit")) {
-        logger.warn("Rate limit hit for staked balance, returning 0");
-        return 0n;
-      }
-      throw error;
+    } catch (error) {
+      logger.error("Failed to get staked balance:", error);
+      return 0n;
     }
   }
 
   getGaugeAddress(): string {
     return CONTRACTS.WETH_VIRTUAL_GAUGE;
-  }
-
-  async testGaugeConnection(): Promise<boolean> {
-    try {
-      if (!this.gaugeContract) {
-        logger.warn("Gauge not initialized");
-        return false;
-      }
-
-      const totalSupply = await this.gaugeContract.totalSupply();
-      logger.info(`✅ Gauge total supply: ${ethers.formatEther(totalSupply)} LP tokens`);
-
-      return true;
-    } catch (error) {
-      logger.error("❌ Gauge connection test failed:", error);
-      return false;
-    }
   }
 }
