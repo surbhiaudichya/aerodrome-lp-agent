@@ -15,14 +15,15 @@ export const ABIS = {
   AERODROME_ROUTER: [
     "function getAmountsOut(uint amountIn, tuple(address from, address to, bool stable, address factory)[] routes) view returns (uint[] amounts)",
     "function quoteAddLiquidity(address tokenA, address tokenB, bool stable, uint amountADesired, uint amountBDesired) view returns (uint amountA, uint amountB, uint liquidity)",
+    "function quoteRemoveLiquidity(address tokenA, address tokenB, bool stable, uint liquidity) view returns (uint amountA, uint amountB)", // ADD THIS LINE
     "function swapExactTokensForTokens(uint amountIn, uint amountOutMin, tuple(address from, address to, bool stable, address factory)[] routes, address to, uint deadline) returns (uint[] amounts)",
     "function addLiquidity(address tokenA, address tokenB, bool stable, uint amountADesired, uint amountBDesired, uint amountAMin, uint amountBMin, address to, uint deadline) returns (uint amountA, uint amountB, uint liquidity)",
+    "function removeLiquidity(address tokenA, address tokenB, bool stable, uint liquidity, uint amountAMin, uint amountBMin, address to, uint deadline) returns (uint amountA, uint amountB)",
   ],
-
   // Aerodrome Factory - to get pool addresses
   AERODROME_FACTORY: ["function getPool(address tokenA, address tokenB, bool stable) view returns (address pool)"],
 
-  // NEW: Aerodrome Gauge ABI - for staking LP tokens
+  // Aerodrome Gauge ABI - for staking LP tokens
   AERODROME_GAUGE: [
     "function deposit(uint256 amount)",
     "function withdraw(uint256 amount)",
@@ -32,7 +33,7 @@ export const ABIS = {
     "function totalSupply() view returns (uint256)",
   ],
 
-  // NEW: Aerodrome Voter ABI - to find gauge addresses
+  // Aerodrome Voter ABI - to find gauge addresses
   AERODROME_VOTER: [
     "function gauges(address pool) view returns (address gauge)",
     "function isGauge(address gauge) view returns (bool)",

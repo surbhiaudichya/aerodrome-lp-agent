@@ -62,6 +62,26 @@ export class GaugeService {
     }
   }
 
+  // NEW: Unstake LP tokens
+  async unstakeLPTokens(lpAmount: bigint): Promise<string> {
+    if (!this.gaugeContract) {
+      throw new Error("Gauge service not initialized");
+    }
+
+    try {
+      logger.info(`🔓 Unstaking ${ethers.formatEther(lpAmount)} LP tokens...`);
+
+      const tx = await this.gaugeContract.withdraw(lpAmount);
+      const receipt = await tx.wait();
+
+      logger.info(`✅ LP tokens unstaked successfully: ${receipt.hash}`);
+      return receipt.hash;
+    } catch (error) {
+      logger.error("❌ LP token unstaking failed:", error);
+      throw error;
+    }
+  }
+
   async getStakedBalance(): Promise<bigint> {
     if (!this.gaugeContract) {
       throw new Error("Gauge service not initialized");

@@ -26,3 +26,16 @@ export interface PositionReceipt {
   stakedLPAmount: string;
   timestamp: string;
 }
+
+export interface WithdrawParams {
+  userAddress: string;
+  lpAmount: string;
+  slippageTolerance?: number;
+}
+
+export interface WithdrawResult {
+  success: boolean;
+  txHashes: string[];
+  usdcReturned: string;
+  error?: string;
+}

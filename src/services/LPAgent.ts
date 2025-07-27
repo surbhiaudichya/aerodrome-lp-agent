@@ -4,7 +4,7 @@ import { TokenService } from "./TokenService";
 import { AerodromeService } from "./AerodromeService";
 import { GaugeService } from "./GaugeService";
 import { CONTRACTS } from "../config/contracts";
-import { DepositParams, DepositResult, PositionReceipt, SwapRoute } from "../types";
+import { DepositParams, DepositResult, PositionReceipt, SwapRoute, WithdrawParams, WithdrawResult } from "../types";
 import { parseUnits, formatUnits, sleep } from "../utils/helpers";
 import { logger } from "../utils/logger";
 
@@ -192,5 +192,200 @@ export class LPAgent {
 
     await sleep(200); // Rate limit protection
     return await contract.balanceOf(this.walletService.getAgentWallet().address);
+  }
+
+  async executeWithdraw(params: WithdrawParams): Promise<WithdrawResult> {
+    const { userAddress, lpAmount, slippageTolerance = 0.5 } = params;
+
+    logger.info(`🔄 Executing withdrawal: ${lpAmount} LP tokens for ${userAddress}`);
+
+    const txHashes: string[] = [];
+
+    try {
+      const lpAmountWei = parseUnits(lpAmount, 18);
+
+      // Step 1: Unstake LP tokens from gauge
+      logger.info("🔓 Step 1: Unstaking LP tokens from gauge...");
+      const unstakeTx = await this.gaugeService.unstakeLPTokens(lpAmountWei);
+      txHashes.push(unstakeTx);
+
+      // Wait for unstaking to settle
+      await sleep(1000);
+
+      // Step 2: Approve LP tokens for router (for liquidity removal)
+      logger.info("🔓 Step 2: Approving LP tokens for router...");
+      const lpApprovalTx = await this.tokenService.approve(
+        this.aerodromeService.getPoolAddress(),
+        CONTRACTS.AERODROME_ROUTER,
+        lpAmountWei,
+      );
+      if (lpApprovalTx !== "no-tx-needed") {
+        txHashes.push(lpApprovalTx);
+      }
+
+      // Wait longer for approval to settle completely
+      await sleep(2000);
+
+      // Step 3: Remove liquidity from pool
+      logger.info("🏊 Step 3: Removing liquidity from WETH-VIRTUAL pool...");
+      const {
+        txHash: removeLiquidityTx,
+        amountA,
+        amountB,
+      } = await this.aerodromeService.removeLiquidity(
+        CONTRACTS.WETH,
+        CONTRACTS.VIRTUAL,
+        lpAmountWei,
+        this.walletService.getAgentWallet().address,
+        slippageTolerance,
+      );
+      txHashes.push(removeLiquidityTx);
+
+      // Wait for liquidity removal to settle
+      await sleep(1000);
+
+      // Get actual balances (WETH and VIRTUAL)
+      const wethBalance = await this.getTokenBalance(CONTRACTS.WETH);
+      const virtualBalance = await this.getTokenBalance(CONTRACTS.VIRTUAL);
+
+      logger.info(
+        `Received from LP removal: ${formatUnits(wethBalance, 18)} WETH, ${formatUnits(virtualBalance, 18)} VIRTUAL`,
+      );
+
+      // Step 4: Approve tokens for swapping back to USDC
+      logger.info("🔓 Step 4a: Approving WETH for swapping...");
+      await this.tokenService.approve(CONTRACTS.WETH, CONTRACTS.AERODROME_ROUTER, wethBalance);
+
+      logger.info("🔓 Step 4b: Approving VIRTUAL for swapping...");
+      await this.tokenService.approve(CONTRACTS.VIRTUAL, CONTRACTS.AERODROME_ROUTER, virtualBalance);
+
+      // Step 5: Swap WETH → USDC
+      logger.info("🔄 Step 5: Swapping WETH → USDC...");
+      const wethToUsdcRoute: SwapRoute[] = [
+        {
+          from: CONTRACTS.WETH,
+          to: CONTRACTS.USDC,
+          stable: false,
+          factory: CONTRACTS.AERODROME_FACTORY,
+        },
+      ];
+
+      const swapWethTx = await this.aerodromeService.swapTokens(
+        wethBalance,
+        wethToUsdcRoute,
+        this.walletService.getAgentWallet().address,
+        slippageTolerance,
+      );
+      txHashes.push(swapWethTx);
+
+      // Step 6: Swap VIRTUAL → USDC
+      logger.info("🔄 Step 6: Swapping VIRTUAL → USDC...");
+      const virtualToUsdcRoute: SwapRoute[] = [
+        {
+          from: CONTRACTS.VIRTUAL,
+          to: CONTRACTS.USDC,
+          stable: false,
+          factory: CONTRACTS.AERODROME_FACTORY,
+        },
+      ];
+
+      const swapVirtualTx = await this.aerodromeService.swapTokens(
+        virtualBalance,
+        virtualToUsdcRoute,
+        this.walletService.getAgentWallet().address,
+        slippageTolerance,
+      );
+      txHashes.push(swapVirtualTx);
+
+      // Step 7: Get final USDC balance and send to user
+      await sleep(1000);
+      const finalUsdcBalance = await this.getTokenBalance(CONTRACTS.USDC);
+
+      logger.info("💰 Step 7: Sending consolidated USDC to user...");
+      const transferTx = await this.tokenService.transfer(CONTRACTS.USDC, userAddress, finalUsdcBalance);
+      txHashes.push(transferTx);
+
+      const usdcReturned = formatUnits(finalUsdcBalance, 6);
+
+      logger.info(`✅ Withdrawal completed successfully!`);
+      logger.info(`USDC returned to user: ${usdcReturned}`);
+
+      return {
+        success: true,
+        txHashes,
+        usdcReturned,
+      };
+    } catch (error) {
+      logger.error("❌ Withdrawal execution failed:", error);
+
+      return {
+        success: false,
+        txHashes,
+        usdcReturned: "0",
+        error: String(error),
+      };
+    }
+  }
+
+  // Helper method to check agent's current staked LP position
+  async getWithdrawableAmount(): Promise<{
+    stakedLP: string;
+    canWithdraw: boolean;
+    message: string;
+  }> {
+    try {
+      const stakedLPWei = await this.gaugeService.getStakedBalance();
+      const stakedLP = formatUnits(stakedLPWei, 18);
+
+      const canWithdraw = parseFloat(stakedLP) > 0;
+      const message = canWithdraw
+        ? `Agent has ${stakedLP} LP tokens available for withdrawal`
+        : "No LP tokens staked - nothing to withdraw";
+
+      return {
+        stakedLP,
+        canWithdraw,
+        message,
+      };
+    } catch (error) {
+      logger.error("Failed to get withdrawable amount:", error);
+      return {
+        stakedLP: "Error",
+        canWithdraw: false,
+        message: "Error checking staked balance",
+      };
+    }
+  }
+
+  // Method to withdraw ALL staked LP tokens
+  async withdrawAll(userAddress: string): Promise<WithdrawResult> {
+    try {
+      const withdrawable = await this.getWithdrawableAmount();
+
+      if (!withdrawable.canWithdraw) {
+        return {
+          success: false,
+          txHashes: [],
+          usdcReturned: "0",
+          error: withdrawable.message,
+        };
+      }
+
+      logger.info(`🔄 Withdrawing ALL staked LP tokens: ${withdrawable.stakedLP}`);
+
+      return await this.executeWithdraw({
+        userAddress,
+        lpAmount: withdrawable.stakedLP,
+        slippageTolerance: 0.5,
+      });
+    } catch (error) {
+      logger.error("❌ Withdraw all failed:", error);
+      return {
+        success: false,
+        txHashes: [],
+        usdcReturned: "0",
+        error: String(error),
+      };
+    }
   }
 }

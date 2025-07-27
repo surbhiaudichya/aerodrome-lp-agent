@@ -170,7 +170,7 @@ export class AerodromeService {
       const receipt = await tx.wait();
       logger.info(`✅ Add liquidity successful: ${receipt.hash}`);
 
-      // ✅ NEW APPROACH: Get actual LP balance from contract
+      // Get actual LP balance from contract
       logger.info("🔍 Getting actual LP balance from contract...");
 
       // Wait a moment for transaction to settle
@@ -188,29 +188,99 @@ export class AerodromeService {
 
       logger.info(`📊 Actual LP balance: ${ethers.formatEther(actualLPBalance)} LP tokens`);
 
-      // ❌ OLD APPROACH (for comparison - keeping commented)
-      /*
-      // BROKEN: Try to extract liquidity amount from logs
-      let liquidityFromLogs = 0n;
-      for (const log of receipt.logs) {
-        try {
-          // Look for Transfer event to LP token contract (mint)
-          if (log.address.toLowerCase() === this.poolAddress.toLowerCase()) {
-            const decoded = ethers.AbiCoder.defaultAbiCoder().decode(["uint256"], log.data);
-            if (decoded[0] > liquidityFromLogs) {
-              liquidityFromLogs = decoded[0];
-            }
-          }
-        } catch (e) {
-          // Ignore decoding errors
-        }
-      }
-      logger.info(`🔍 Log parsing would have returned: ${ethers.formatEther(liquidityFromLogs)} (WRONG!)`);
-      */
-
       return { txHash: receipt.hash, liquidity: actualLPBalance };
     } catch (error) {
       logger.error("❌ Add liquidity failed:", error);
+      throw error;
+    }
+  }
+
+  // NEW: Remove liquidity function - ADD THIS TO THE END OF YOUR AerodromeService CLASS
+  async removeLiquidity(
+    tokenA: string,
+    tokenB: string,
+    lpAmount: bigint,
+    to: string,
+    slippage: number = 0.5,
+    deadline?: number,
+  ): Promise<{ txHash: string; amountA: bigint; amountB: bigint }> {
+    const { calculateMinAmount, calculateDeadline } = await import("../utils/helpers");
+
+    try {
+      // Get expected amounts out (but don't fail if we can't) - similar to your swapTokens logic
+      let amountAMin = 0n;
+      let amountBMin = 0n;
+
+      try {
+        // Try to get quote for minimum amounts with slippage protection
+        const quoteResult = await this.routerContract.quoteRemoveLiquidity(
+          tokenA,
+          tokenB,
+          false, // volatile pool
+          lpAmount,
+        );
+
+        amountAMin = calculateMinAmount(quoteResult.amountA, slippage);
+        amountBMin = calculateMinAmount(quoteResult.amountB, slippage);
+
+        logger.info(
+          `Expected removal: ${ethers.formatEther(quoteResult.amountA)} + ${ethers.formatEther(quoteResult.amountB)}`,
+        );
+      } catch (error) {
+        logger.warn("Could not get exact removal quote, using minimal slippage protection");
+        // For small amounts, use 0 to prevent failures (like your swap logic)
+        amountAMin = 0n;
+        amountBMin = 0n;
+      }
+
+      const liquidityDeadline = deadline || calculateDeadline();
+
+      logger.info(`Removing liquidity: ${ethers.formatEther(lpAmount)} LP tokens with ${slippage}% slippage`);
+      logger.info(`Min amounts: ${ethers.formatEther(amountAMin)} + ${ethers.formatEther(amountBMin)}`);
+
+      const tx = await this.routerContract.removeLiquidity(
+        tokenA,
+        tokenB,
+        false, // volatile pool
+        lpAmount,
+        amountAMin,
+        amountBMin,
+        to,
+        liquidityDeadline,
+      );
+
+      const receipt = await tx.wait();
+      logger.info(`✅ Remove liquidity successful: ${receipt.hash}`);
+
+      // Get actual token balances after removal (similar to your LP balance logic)
+      logger.info("🔍 Getting actual token balances from contracts...");
+
+      await sleep(1000); // Wait for transaction to settle
+
+      const tokenAContract = new ethers.Contract(
+        tokenA,
+        ["function balanceOf(address owner) view returns (uint256)"],
+        this.walletService.getProvider(),
+      );
+
+      const tokenBContract = new ethers.Contract(
+        tokenB,
+        ["function balanceOf(address owner) view returns (uint256)"],
+        this.walletService.getProvider(),
+      );
+
+      await sleep(200); // Rate limit protection
+      const amountA = await tokenAContract.balanceOf(to);
+
+      await sleep(200); // Rate limit protection
+      const amountB = await tokenBContract.balanceOf(to);
+
+      logger.info(`📊 Received: ${ethers.formatEther(amountA)} ${tokenA === CONTRACTS.WETH ? "WETH" : "VIRTUAL"}`);
+      logger.info(`📊 Received: ${ethers.formatEther(amountB)} ${tokenB === CONTRACTS.VIRTUAL ? "VIRTUAL" : "WETH"}`);
+
+      return { txHash: receipt.hash, amountA, amountB };
+    } catch (error) {
+      logger.error("❌ Remove liquidity failed:", error);
       throw error;
     }
   }

@@ -63,4 +63,20 @@ export class TokenService {
       throw error;
     }
   }
+
+  async transfer(tokenAddress: string, to: string, amount: bigint): Promise<string> {
+    const contract = this.getTokenContract(tokenAddress);
+    logger.info(`Transferring ${amount.toString()} tokens to ${to}`);
+
+    try {
+      const tx = await contract.transfer(to, amount);
+      const receipt = await tx.wait();
+
+      logger.info(`Token transfer successful: ${receipt.hash}`);
+      return receipt.hash;
+    } catch (error) {
+      logger.error(`Token transfer failed:`, error);
+      throw error;
+    }
+  }
 }

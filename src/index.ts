@@ -3,6 +3,7 @@ import { LPAgent } from "./services/LPAgent";
 import { WalletService } from "./services/WalletService";
 import { logger } from "./utils/logger";
 import { CHAIN_ID } from "./config/contracts";
+import { WithdrawParams, WithdrawResult } from "./types";
 
 // Load environment variables
 dotenv.config();
@@ -41,26 +42,52 @@ async function main() {
         }
         await executeFullDeposit(lpAgent, args[1], args[2]);
         break;
+      case "withdraw":
+        if (args.length < 3) {
+          console.error("Usage: npm run dev withdraw <userAddress> <lpAmount>");
+          console.error("Example: npm run dev withdraw 0x65655D5d18F41775156CdFb53cC5710E13380070 0.001");
+          console.error("⚠️  WARNING: This executes real withdrawal transactions!");
+          process.exit(1);
+        }
+        await executeWithdraw(lpAgent, args[1], args[2]);
+        break;
+
+      case "withdraw-all":
+        if (args.length < 2) {
+          console.error("Usage: npm run dev withdraw-all <userAddress>");
+          console.error("Example: npm run dev withdraw-all 0x65655D5d18F41775156CdFb53cC5710E13380070");
+          console.error("⚠️  WARNING: This withdraws ALL staked LP tokens!");
+          process.exit(1);
+        }
+        await executeWithdrawAll(lpAgent, args[1]);
+        break;
+
+      case "check-withdrawable":
+        await checkWithdrawable(lpAgent);
+        break;
 
       default:
-        console.log("🚀 Aerodrome LP Agent - Complete 6-Step Automation");
-        console.log("================================================");
+        console.log("\n🚀 Aerodrome LP Agent - Complete Automation");
+        console.log("===========================================");
         console.log("");
-        console.log("Available command:");
+        console.log("📥 DEPOSIT FLOW:");
         console.log("  npm run dev deposit <userAddress> <usdcAmount>");
+        console.log("  Example: npm run dev deposit 0x65655D5d18F41775156CdFb53cC5710E13380070 5");
         console.log("");
-        console.log("Example:");
-        console.log("  npm run dev deposit 0x65655D5d18F41775156CdFb53cC5710E13380070 5");
+        console.log("📤 WITHDRAWAL FLOW:");
+        console.log("  npm run dev withdraw <userAddress> <lpAmount>");
+        console.log("  npm run dev withdraw-all <userAddress>");
+        console.log("  npm run dev check-withdrawable");
         console.log("");
-        console.log("This will execute ALL 6 steps:");
-        console.log("  1. Accept USDC from user");
-        console.log("  2. Swap 50% USDC → WETH");
-        console.log("  3. Swap 50% USDC → VIRTUAL");
-        console.log("  4. Add liquidity to WETH-VIRTUAL pool");
-        console.log("  5. Stake LP tokens in Aerodrome gauge");
-        console.log("  6. Return position receipt to user");
+        console.log("Examples:");
+        console.log("  npm run dev withdraw 0x65655D5d18F41775156CdFb53cC5710E13380070 0.001");
+        console.log("  npm run dev withdraw-all 0x65655D5d18F41775156CdFb53cC5710E13380070");
         console.log("");
-        console.log("⚠️  Make sure user has approved agent to spend USDC first!");
+        console.log("🔄 COMPLETE AUTOMATION:");
+        console.log("  DEPOSIT:  USDC → WETH + VIRTUAL → LP → Staked LP");
+        console.log("  WITHDRAW: Staked LP → LP → WETH + VIRTUAL → USDC");
+        console.log("");
+        console.log("⚠️  All commands execute REAL transactions on Base mainnet!");
     }
   } catch (error) {
     logger.error("❌ Error:", error);
@@ -173,6 +200,158 @@ async function executeFullDeposit(lpAgent: LPAgent, userAddress: string, usdcAmo
     console.log("\n❌ AUTOMATION FAILED");
     console.log("====================");
     console.log(`Unexpected error: ${error}`);
+  }
+}
+
+async function executeWithdraw(lpAgent: LPAgent, userAddress: string, lpAmount: string) {
+  console.log("🔄 EXECUTING LP WITHDRAWAL");
+  console.log("==========================");
+  console.log(`User: ${userAddress}`);
+  console.log(`LP Amount: ${lpAmount}`);
+  console.log("");
+  console.log("Steps: Unstake → Remove Liquidity → Swap → Send USDC");
+  console.log("");
+  console.log("⚠️  WARNING: This executes REAL withdrawal transactions!");
+  console.log("");
+  console.log("Executing in 5 seconds... Press Ctrl+C to cancel");
+
+  // Countdown
+  for (let i = 5; i > 0; i--) {
+    console.log(`${i}...`);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  try {
+    // Initialize agent
+    await lpAgent.initialize();
+
+    // Execute withdrawal
+    const result = await lpAgent.executeWithdraw({
+      userAddress,
+      lpAmount,
+      slippageTolerance: 0.5,
+    });
+
+    if (result.success) {
+      console.log("\n🎉 WITHDRAWAL SUCCESS!");
+      console.log("======================");
+      console.log(`✅ Success: ${result.success}`);
+      console.log(`💵 USDC Returned: ${result.usdcReturned}`);
+      console.log(`📝 Total Transactions: ${result.txHashes.length}`);
+      console.log("");
+
+      console.log("Transaction Hashes:");
+      const steps = [
+        "Unstake LP",
+        "LP Approval",
+        "Remove Liquidity",
+        "WETH→USDC Swap",
+        "VIRTUAL→USDC Swap",
+        "USDC Transfer",
+      ];
+
+      result.txHashes.forEach((hash: string, i: number) => {
+        console.log(`  ${i + 1}. ${steps[i] || "Transaction"}: https://basescan.org/tx/${hash}`);
+      });
+
+      console.log("\n🏆 WITHDRAWAL COMPLETE!");
+      console.log("=======================");
+      console.log("✅ LP tokens → WETH + VIRTUAL → USDC");
+      console.log("✅ Consolidated USDC sent to user");
+      console.log("✅ Complete reversal of deposit flow");
+    } else {
+      console.log("\n❌ WITHDRAWAL FAILED");
+      console.log("====================");
+      console.log(`Error: ${result.error}`);
+      console.log(`Transactions executed: ${result.txHashes.length}`);
+      console.log("");
+      console.log("Transaction Hashes (for debugging):");
+      result.txHashes.forEach((hash: string, i: number) => {
+        console.log(`  ${i + 1}. https://basescan.org/tx/${hash}`);
+      });
+    }
+  } catch (error) {
+    logger.error("❌ Withdrawal execution failed:", error);
+    console.log("\n❌ WITHDRAWAL FAILED");
+    console.log("====================");
+    console.log(`Unexpected error: ${error}`);
+  }
+}
+
+async function executeWithdrawAll(lpAgent: LPAgent, userAddress: string) {
+  console.log("🔄 EXECUTING COMPLETE LP WITHDRAWAL (ALL TOKENS)");
+  console.log("===============================================");
+  console.log(`User: ${userAddress}`);
+  console.log("");
+  console.log("⚠️  WARNING: This withdraws ALL staked LP tokens!");
+  console.log("");
+  console.log("Executing in 5 seconds... Press Ctrl+C to cancel");
+
+  // Countdown
+  for (let i = 5; i > 0; i--) {
+    console.log(`${i}...`);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+  }
+
+  try {
+    // Initialize agent
+    await lpAgent.initialize();
+
+    // Execute complete withdrawal
+    const result = await lpAgent.withdrawAll(userAddress);
+
+    if (result.success) {
+      console.log("\n🎉 COMPLETE WITHDRAWAL SUCCESS!");
+      console.log("================================");
+      console.log(`💵 Total USDC Returned: ${result.usdcReturned}`);
+      console.log(`📝 Total Transactions: ${result.txHashes.length}`);
+      console.log("");
+
+      console.log("Transaction Hashes:");
+      result.txHashes.forEach((hash: string, i: number) => {
+        console.log(`  ${i + 1}. https://basescan.org/tx/${hash}`);
+      });
+
+      console.log("\n🏆 FULL POSITION LIQUIDATED!");
+      console.log("============================");
+      console.log("✅ All LP tokens withdrawn");
+      console.log("✅ All funds returned as USDC");
+      console.log("✅ Position completely closed");
+    } else {
+      console.log("\n❌ WITHDRAWAL FAILED");
+      console.log("====================");
+      console.log(`Error: ${result.error}`);
+    }
+  } catch (error) {
+    logger.error("❌ Complete withdrawal failed:", error);
+  }
+}
+
+async function checkWithdrawable(lpAgent: LPAgent) {
+  logger.info("🔍 Checking withdrawable LP position...");
+
+  try {
+    await lpAgent.initialize();
+
+    const withdrawable = await lpAgent.getWithdrawableAmount();
+
+    console.log("\n📊 WITHDRAWABLE POSITION");
+    console.log("========================");
+    console.log(`Staked LP Tokens: ${withdrawable.stakedLP}`);
+    console.log(`Can Withdraw: ${withdrawable.canWithdraw ? "✅" : "❌"}`);
+    console.log(`Status: ${withdrawable.message}`);
+    console.log("");
+
+    if (withdrawable.canWithdraw) {
+      console.log("💡 Available Commands:");
+      console.log(`  npm run dev withdraw <userAddr> ${withdrawable.stakedLP}`);
+      console.log(`  npm run dev withdraw-all <userAddr>`);
+    } else {
+      console.log("💡 No LP tokens available for withdrawal");
+      console.log("   Complete a deposit first to have withdrawable tokens");
+    }
+  } catch (error) {
+    logger.error("❌ Failed to check withdrawable amount:", error);
   }
 }
 
