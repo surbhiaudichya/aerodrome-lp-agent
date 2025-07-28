@@ -20,8 +20,8 @@ export class TokenService {
     logger.info(`Approving ${amount.toString()} tokens for ${spender}`);
 
     try {
-      // Add delay to avoid rate limits
-      await sleep(200);
+      // Add longer delay to avoid rate limits and nonce conflicts
+      await sleep(3000); // Increase to 3 seconds
 
       const currentAllowance = await contract.allowance(this.walletService.getAgentWallet().address, spender);
 
@@ -35,12 +35,19 @@ export class TokenService {
         const resetTx = await contract.approve(spender, 0n);
         await resetTx.wait();
         logger.info("Reset existing allowance to 0");
+
+        // Wait after reset before new approval
+        await sleep(2000);
       }
 
       const tx = await contract.approve(spender, amount);
       const receipt = await tx.wait();
 
       logger.info(`Token approval successful: ${receipt.hash}`);
+
+      // Wait after approval before next transaction
+      await sleep(1000);
+
       return receipt.hash;
     } catch (error) {
       logger.error(`Token approval failed:`, error);
@@ -53,10 +60,15 @@ export class TokenService {
     logger.info(`Transferring ${amount.toString()} tokens from ${from} to ${to}`);
 
     try {
+      await sleep(1000); // Add delay before transfer
+
       const tx = await contract.transferFrom(from, to, amount);
       const receipt = await tx.wait();
 
       logger.info(`Token transferFrom successful: ${receipt.hash}`);
+
+      await sleep(1000); // Add delay after transfer
+
       return receipt.hash;
     } catch (error) {
       logger.error(`Token transferFrom failed:`, error);
@@ -69,10 +81,15 @@ export class TokenService {
     logger.info(`Transferring ${amount.toString()} tokens to ${to}`);
 
     try {
+      await sleep(1000); // Add delay before transfer
+
       const tx = await contract.transfer(to, amount);
       const receipt = await tx.wait();
 
       logger.info(`Token transfer successful: ${receipt.hash}`);
+
+      await sleep(1000); // Add delay after transfer
+
       return receipt.hash;
     } catch (error) {
       logger.error(`Token transfer failed:`, error);

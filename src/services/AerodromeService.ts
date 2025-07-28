@@ -109,6 +109,9 @@ export class AerodromeService {
     const { calculateMinAmount, calculateDeadline } = await import("../utils/helpers");
 
     try {
+      // Add delay before swap
+      await sleep(2000);
+
       // Get expected amount out (but don't fail if we can't)
       let amountOutMin = 0n;
       try {
@@ -127,6 +130,9 @@ export class AerodromeService {
 
       const receipt = await tx.wait();
       logger.info(`✅ Swap successful: ${receipt.hash}`);
+
+      // Add delay after swap
+      await sleep(1000);
 
       return receipt.hash;
     } catch (error) {

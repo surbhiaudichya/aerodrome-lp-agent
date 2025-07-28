@@ -65,7 +65,14 @@ async function main() {
       case "check-withdrawable":
         await checkWithdrawable(lpAgent);
         break;
-
+      case "recover":
+        if (args.length < 2) {
+          console.error("Usage: npm run dev recover <userAddress>");
+          console.error("Example: npm run dev recover 0x65655D5d18F41775156CdFb53cC5710E13380070");
+          process.exit(1);
+        }
+        await executeRecover(lpAgent, args[1]);
+        break;
       default:
         console.log("\n🚀 Aerodrome LP Agent - Complete Automation");
         console.log("===========================================");
@@ -352,6 +359,26 @@ async function checkWithdrawable(lpAgent: LPAgent) {
     }
   } catch (error) {
     logger.error("❌ Failed to check withdrawable amount:", error);
+  }
+}
+async function executeRecover(lpAgent: LPAgent, userAddress: string) {
+  console.log("🔄 RECOVERING STRANDED TOKENS");
+  console.log("=============================");
+
+  try {
+    await lpAgent.initialize();
+    const result = await lpAgent.recoverStrandedTokens(userAddress);
+
+    if (result.success) {
+      console.log(`✅ Recovery successful! USDC returned: ${result.usdcReturned}`);
+      result.txHashes.forEach((hash, i) => {
+        console.log(`  ${i + 1}. https://basescan.org/tx/${hash}`);
+      });
+    } else {
+      console.log(`❌ Recovery failed: ${result.error}`);
+    }
+  } catch (error) {
+    console.log(`❌ Recovery failed: ${error}`);
   }
 }
 

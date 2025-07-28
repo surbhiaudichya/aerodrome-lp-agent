@@ -1,4 +1,4 @@
-# DeFi Agent Assignment: Aerodrome WETH-VIRTUAL LP Automation
+# DeFi Agent: Aerodrome WETH-VIRTUAL LP Automation
 
 ## 🎯 Objective
 
@@ -86,33 +86,33 @@ The agent uses its own dedicated wallet for executing all transactions:
 
 ### ✅ Deposit Flow - Complete USDC → LP → Staked Transaction
 
-**Input:** 4 USDC from user `0x65655D5d18F41775156CdFb53cC5710E13380070`  
-**Output:** `0.046812927231281446` staked LP tokens earning AERO rewards
+**Input:** 10 USDC from user `0x65655D5d18F41775156CdFb53cC5710E13380070`  
+**Output:** `0.000227815495683448` staked LP tokens earning AERO rewards
 
 | Step | Transaction Hash | Purpose |
 |------|------------------|---------|
-| USDC Transfer | [0xb384ec14b4ecd9509e2752d96c8d356a21fe767c8c37ba27c7c67d73c9be036b](https://basescan.org/tx/0xb384ec14b4ecd9509e2752d96c8d356a21fe767c8c37ba27c7c67d73c9be036b) | Transfer USDC from user to agent |
-| USDC→WETH Swap | [0x13a2454eddc2dd0a74a3a42e4b05300e6de684f927df96fe5f419e9c4392acb1](https://basescan.org/tx/0x13a2454eddc2dd0a74a3a42e4b05300e6de684f927df96fe5f419e9c4392acb1) | Swap 50% USDC to WETH |
-| USDC→VIRTUAL Swap | [0x3d977ce3ca18809effc50abb3dc26bd61a2ae9351e5d45b9805b9daefedc2d1d](https://basescan.org/tx/0x3d977ce3ca18809effc50abb3dc26bd61a2ae9351e5d45b9805b9daefedc2d1d) | Swap 50% USDC to VIRTUAL |
-| Add Liquidity | [0x39425a1832706dccb5107715771dd91a69d1d210a4e229d6a553e1ef90f9973b](https://basescan.org/tx/0x39425a1832706dccb5107715771dd91a69d1d210a4e229d6a553e1ef90f9973b) | Add WETH+VIRTUAL to LP pool |
-| Stake LP Tokens | [0x8b5839d4821544246cca10e5f873ed54abef326c869779d2cd9386b9700158cf](https://basescan.org/tx/0x8b5839d4821544246cca10e5f873ed54abef326c869779d2cd9386b9700158cf) | Stake LP tokens in gauge |
+| USDC Transfer | [0xd670b81a7ce1c73bf495867c5d007aca81bb4cddff10de998727a41c1b91ca14](https://basescan.org/tx/0xd670b81a7ce1c73bf495867c5d007aca81bb4cddff10de998727a41c1b91ca14) | Transfer USDC from user to agent |
+| USDC→WETH Swap | [0x027ecc0ef1bd999a86728561174c73057041815c73bca0af6f373428230c9ee2](https://basescan.org/tx/0x027ecc0ef1bd999a86728561174c73057041815c73bca0af6f373428230c9ee2) | Swap 50% USDC to WETH |
+| USDC→VIRTUAL Swap | [0x1305e887e27b4b013ac6c5e4701c4fac7f8bdc2f7736a887ec0a1fcef93b3267](https://basescan.org/tx/0x1305e887e27b4b013ac6c5e4701c4fac7f8bdc2f7736a887ec0a1fcef93b3267) | Swap 50% USDC to VIRTUAL |
+| Add Liquidity | [0xafc27d210e42c4644700a66be44a322c840bc799bb4dbf62173546c06c9f3678](https://basescan.org/tx/0xafc27d210e42c4644700a66be44a322c840bc799bb4dbf62173546c06c9f3678) | Add WETH+VIRTUAL to LP pool |
+| Stake LP Tokens | [0x51486873d5cf6edad4cdb13a4f5ad6baf5d362690c063707b9f3ac2f6de4f9e1](https://basescan.org/tx/0x51486873d5cf6edad4cdb13a4f5ad6baf5d362690c063707b9f3ac2f6de4f9e1) | Stake LP tokens in gauge |
 
-**✅ Result:** Complete automation from 4 USDC → 0.046812927231281446 staked LP tokens
+**✅ Result:** Complete automation from 10 USDC → 0.000227815495683448 staked LP tokens
 
 ### ✅ Withdraw Flow - Complete Unstaked → LP → USDC Transaction
 
-**Input:** `0.004` LP tokens (partial withdrawal test)  
-**Output:** `10.317424` USDC returned to user `0x65655D5d18F41775156CdFb53cC5710E13380070`
+**Input:** `0.000227815495683448` LP tokens (complete withdrawal)  
+**Output:** `4.986617` USDC returned to user `0x65655D5d18F41775156CdFb53cC5710E13380070`
 
 | Step | Transaction Hash | Purpose |
 |------|------------------|---------|
-| Unstake LP | [0x6d453b799a2bddefc5701fd5f86391f18fc2c37acf8394c6c50ad46ee6f34262](https://basescan.org/tx/0x6d453b799a2bddefc5701fd5f86391f18fc2c37acf8394c6c50ad46ee6f34262) | Unstake LP tokens from gauge |
-| Remove Liquidity | [0x3a70ef617d42af3f60444464b5b3febab34f5ac73950a6f0b8a0370ed3f578fe](https://basescan.org/tx/0x3a70ef617d42af3f60444464b5b3febab34f5ac73950a6f0b8a0370ed3f578fe) | Remove liquidity → WETH + VIRTUAL |
-| WETH→USDC Swap | [0x4c3cdb4e8de4941da5dc4105051a094c0b7cce4a7ee2ec03ec92b19c8d6a8114](https://basescan.org/tx/0x4c3cdb4e8de4941da5dc4105051a094c0b7cce4a7ee2ec03ec92b19c8d6a8114) | Convert WETH back to USDC |
-| VIRTUAL→USDC Swap | [0xbefcf419f8ac9a9a8a5f5533967b8e83a09fb9bc486c6b40c2c9b4dd717ca563](https://basescan.org/tx/0xbefcf419f8ac9a9a8a5f5533967b8e83a09fb9bc486c6b40c2c9b4dd717ca563) | Convert VIRTUAL back to USDC |
-| USDC Transfer | [0xb6a5a2aa6d2f401d344ec87da28e9f496b4a7d83d4d66a764d709f48035e7af8](https://basescan.org/tx/0xb6a5a2aa6d2f401d344ec87da28e9f496b4a7d83d4d66a764d709f48035e7af8) | Send consolidated USDC to user |
+| Unstake LP | [0x8d165733bc0407ca8ca28657abd5037dc89b7ef788c59af3a0fc65a07b9b2e4e](https://basescan.org/tx/0x8d165733bc0407ca8ca28657abd5037dc89b7ef788c59af3a0fc65a07b9b2e4e) | Unstake LP tokens from gauge |
+| Remove Liquidity | [0xc66c813d25ee1d285523ee7573f6f66e8136af0608bc17eab59d0b072192369d](https://basescan.org/tx/0xc66c813d25ee1d285523ee7573f6f66e8136af0608bc17eab59d0b072192369d) | Remove liquidity → WETH + VIRTUAL |
+| WETH→USDC Swap | [0xbcf911e3851fb499f3678d5ef83ba8079beb286283df2013080c8b0a01174181](https://basescan.org/tx/0xbcf911e3851fb499f3678d5ef83ba8079beb286283df2013080c8b0a01174181) | Convert WETH back to USDC |
+| VIRTUAL→USDC Swap | [0x3071b37c6881ac1e7d42786e668b8fce3b765da56410f0c1e4c95297d97ab3f8](https://basescan.org/tx/0x3071b37c6881ac1e7d42786e668b8fce3b765da56410f0c1e4c95297d97ab3f8) | Convert VIRTUAL back to USDC |
+| USDC Transfer | [0x924a5a16414ada06bd73f4bc2d953efc2fb14a8b6bc6d669df963facd5d7c68a](https://basescan.org/tx/0x924a5a16414ada06bd73f4bc2d953efc2fb14a8b6bc6d669df963facd5d7c68a) | Send consolidated USDC to user |
 
-**✅ Result:** Complete reversal from 0.004 LP tokens → 10.317424 USDC returned
+**✅ Result:** Complete round-trip from 0.000227815495683448 LP tokens → 4.986617 USDC returned
 
 ## 🚀 How to Run the Deposit/Withdraw Flows
 
@@ -123,7 +123,7 @@ npm run dev deposit <userAddress> <usdcAmount>
 
 **Example:**
 ```bash
-npm run dev deposit 0x65655D5d18F41775156CdFb53cC5710E13380070 4
+npm run dev deposit 0x65655D5d18F41775156CdFb53cC5710E13380070 10
 ```
 
 **Prerequisites:**
@@ -144,7 +144,7 @@ npm run dev check-withdrawable
 
 **Examples:**
 ```bash
-npm run dev withdraw 0x65655D5d18F41775156CdFb53cC5710E13380070 0.004
+npm run dev withdraw 0x65655D5d18F41775156CdFb53cC5710E13380070 0.0001
 npm run dev withdraw-all 0x65655D5d18F41775156CdFb53cC5710E13380070
 ```
 
@@ -225,12 +225,12 @@ npm run build
 
 ### Deposit Flow Example
 ```bash
-$ npm run dev deposit 0x65655D5d18F41775156CdFb53cC5710E13380070 4
+$ npm run dev deposit 0x65655D5d18F41775156CdFb53cC5710E13380070 10
 
 🚀 EXECUTING COMPLETE 6-STEP DEPOSIT AUTOMATION
 ===============================================
 User: 0x65655D5d18F41775156CdFb53cC5710E13380070
-Amount: 4 USDC
+Amount: 10 USDC
 
 Steps: Transfer → Swap → Add Liquidity → Stake → Generate Receipt
 
@@ -242,19 +242,16 @@ Steps: Transfer → Swap → Add Liquidity → Stake → Generate Receipt
 ✅ Step 6: Generating position receipt...
 
 🎉 COMPLETE AUTOMATION SUCCESS!
-Staked LP Amount: 0.046812927231281446
+Staked LP Amount: 0.000227815495683448
 ```
 
 ### Withdrawal Flow Example
 ```bash
-$ npm run dev withdraw 0x65655D5d18F41775156CdFb53cC5710E13380070 0.004
+$ npm run dev withdraw-all 0x65655D5d18F41775156CdFb53cC5710E13380070
 
-🔄 EXECUTING LP WITHDRAWAL
-==========================
+🔄 EXECUTING COMPLETE LP WITHDRAWAL (ALL TOKENS)
+===============================================
 User: 0x65655D5d18F41775156CdFb53cC5710E13380070
-LP Amount: 0.004
-
-Steps: Unstake → Remove Liquidity → Swap → Send USDC
 
 ✅ Step 1: Unstaking LP tokens from gauge...
 ✅ Step 2: Removing liquidity from WETH-VIRTUAL pool...
@@ -262,8 +259,8 @@ Steps: Unstake → Remove Liquidity → Swap → Send USDC
 ✅ Step 4: Swapping VIRTUAL → USDC...
 ✅ Step 5: Sending consolidated USDC to user...
 
-🎉 WITHDRAWAL SUCCESS!
-USDC Returned: 10.317424
+🎉 COMPLETE WITHDRAWAL SUCCESS!
+USDC Returned: 4.986617
 ```
 
 ## 🎯 Bonus Features
@@ -318,4 +315,4 @@ MIT License - See LICENSE file for details
 3. **Setup Instructions:** ✅ Complete installation and execution guide
 4. **Architecture Explanation:** ✅ Detailed technical documentation
 
-**🎯 Result: Full DeFi automation agent successfully deployed and tested on Base mainnet with 10 successful transactions proving complete LP lifecycle management.**
+**🎯 Result: Full DeFi automation agent successfully deployed and tested on Base mainnet with 11 successful transactions proving complete LP lifecycle management.**

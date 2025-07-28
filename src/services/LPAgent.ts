@@ -37,6 +37,7 @@ export class LPAgent {
     logger.info(`🚀 Executing FULL deposit: ${usdcAmount} USDC from ${userAddress}`);
 
     const txHashes: string[] = [];
+    let transferredToAgent = false; // Track if USDC was transferred
 
     try {
       const usdcAmountBigInt = parseUnits(usdcAmount, 6);
@@ -51,6 +52,7 @@ export class LPAgent {
         usdcAmountBigInt,
       );
       txHashes.push(transferTx);
+      transferredToAgent = true; // Mark as transferred
 
       // Step 2: Approve USDC for router
       logger.info("🔓 Step 2: Approving USDC for Aerodrome router...");
@@ -65,7 +67,7 @@ export class LPAgent {
         {
           from: CONTRACTS.USDC,
           to: CONTRACTS.WETH,
-          stable: false,
+          stable: true,
           factory: CONTRACTS.AERODROME_FACTORY,
         },
       ];
@@ -155,6 +157,20 @@ export class LPAgent {
     } catch (error) {
       logger.error("❌ Full deposit execution failed:", error);
 
+      // EMERGENCY RECOVERY: Return USDC if we transferred it
+      if (transferredToAgent) {
+        try {
+          logger.info("🚨 Attempting emergency USDC return...");
+          const usdcBalance = await this.getTokenBalance(CONTRACTS.USDC);
+          if (usdcBalance > 0n) {
+            const returnTx = await this.tokenService.transfer(CONTRACTS.USDC, userAddress, usdcBalance);
+            txHashes.push(returnTx);
+            logger.info(`✅ Emergency USDC return successful: ${returnTx}`);
+          }
+        } catch (recoveryError) {
+          logger.error("❌ Emergency USDC return also failed:", recoveryError);
+        }
+      }
       return {
         success: false,
         txHashes,
@@ -254,16 +270,16 @@ export class LPAgent {
 
       // Step 4: Approve tokens for swapping back to USDC
       logger.info("🔓 Step 4a: Approving WETH for swapping...");
-      await sleep(2000); // Add delay before approval
+      await sleep(3000); // Increase delay
       await this.tokenService.approve(CONTRACTS.WETH, CONTRACTS.AERODROME_ROUTER, wethBalance);
 
       logger.info("🔓 Step 4b: Approving VIRTUAL for swapping...");
-      await sleep(2000); // Add delay before approval
+      await sleep(3000); // Increase delay
       await this.tokenService.approve(CONTRACTS.VIRTUAL, CONTRACTS.AERODROME_ROUTER, virtualBalance);
 
       // Step 5: Swap WETH → USDC
       logger.info("🔄 Step 5: Swapping WETH → USDC...");
-      await sleep(1000); // Add delay before swap
+      await sleep(2000); // Add delay before swap
       const wethToUsdcRoute: SwapRoute[] = [
         {
           from: CONTRACTS.WETH,
@@ -282,7 +298,7 @@ export class LPAgent {
 
       // Step 6: Swap VIRTUAL → USDC
       logger.info("🔄 Step 6: Swapping VIRTUAL → USDC...");
-      await sleep(1000); // Add delay before swap
+      await sleep(2000); // Add delay before swap
       const virtualToUsdcRoute: SwapRoute[] = [
         {
           from: CONTRACTS.VIRTUAL,
@@ -301,9 +317,8 @@ export class LPAgent {
       txHashes.push(swapVirtualTx);
 
       // Step 7: Get final USDC balance and send to user
-      await sleep(1000);
+      await sleep(3000); // Increase delay before final transfer
       const finalUsdcBalance = await this.getTokenBalance(CONTRACTS.USDC);
-
       logger.info("💰 Step 7: Sending consolidated USDC to user...");
       const transferTx = await this.tokenService.transfer(CONTRACTS.USDC, userAddress, finalUsdcBalance);
       txHashes.push(transferTx);
@@ -386,6 +401,114 @@ export class LPAgent {
       return {
         success: false,
         txHashes: [],
+        usdcReturned: "0",
+        error: String(error),
+      };
+    }
+  }
+
+  // Add this method to the LPAgent class (after the withdrawAll method)
+  async recoverStrandedTokens(userAddress: string): Promise<WithdrawResult> {
+    logger.info(`🔄 Recovering stranded tokens for ${userAddress}`);
+
+    const txHashes: string[] = [];
+
+    try {
+      // Check what tokens we have
+      const wethBalance = await this.getTokenBalance(CONTRACTS.WETH);
+      const virtualBalance = await this.getTokenBalance(CONTRACTS.VIRTUAL);
+      const usdcBalance = await this.getTokenBalance(CONTRACTS.USDC);
+
+      logger.info(`Found tokens in agent wallet:`);
+      logger.info(`  WETH: ${formatUnits(wethBalance, 18)}`);
+      logger.info(`  VIRTUAL: ${formatUnits(virtualBalance, 18)}`);
+      logger.info(`  USDC: ${formatUnits(usdcBalance, 6)}`);
+
+      if (wethBalance === 0n && virtualBalance === 0n && usdcBalance === 0n) {
+        return {
+          success: false,
+          txHashes: [],
+          usdcReturned: "0",
+          error: "No tokens found in agent wallet",
+        };
+      }
+
+      // Approve and swap WETH if we have any
+      if (wethBalance > 0n) {
+        logger.info("🔓 Approving WETH for swapping...");
+        await sleep(3000);
+        await this.tokenService.approve(CONTRACTS.WETH, CONTRACTS.AERODROME_ROUTER, wethBalance);
+
+        logger.info("🔄 Swapping WETH → USDC...");
+        await sleep(2000);
+        const wethToUsdcRoute: SwapRoute[] = [
+          {
+            from: CONTRACTS.WETH,
+            to: CONTRACTS.USDC,
+            stable: true, // Use stable route for better liquidity
+            factory: CONTRACTS.AERODROME_FACTORY,
+          },
+        ];
+
+        const swapWethTx = await this.aerodromeService.swapTokens(
+          wethBalance,
+          wethToUsdcRoute,
+          this.walletService.getAgentWallet().address,
+          2.0, // Higher slippage for recovery
+        );
+        txHashes.push(swapWethTx);
+      }
+
+      // Approve and swap VIRTUAL if we have any
+      if (virtualBalance > 0n) {
+        logger.info("🔓 Approving VIRTUAL for swapping...");
+        await sleep(3000);
+        await this.tokenService.approve(CONTRACTS.VIRTUAL, CONTRACTS.AERODROME_ROUTER, virtualBalance);
+
+        logger.info("🔄 Swapping VIRTUAL → USDC...");
+        await sleep(2000);
+        const virtualToUsdcRoute: SwapRoute[] = [
+          {
+            from: CONTRACTS.VIRTUAL,
+            to: CONTRACTS.USDC,
+            stable: false, // VIRTUAL is volatile
+            factory: CONTRACTS.AERODROME_FACTORY,
+          },
+        ];
+
+        const swapVirtualTx = await this.aerodromeService.swapTokens(
+          virtualBalance,
+          virtualToUsdcRoute,
+          this.walletService.getAgentWallet().address,
+          2.0, // Higher slippage for recovery
+        );
+        txHashes.push(swapVirtualTx);
+      }
+
+      // Get final USDC balance and send to user
+      await sleep(3000);
+      const finalUsdcBalance = await this.getTokenBalance(CONTRACTS.USDC);
+
+      if (finalUsdcBalance > 0n) {
+        logger.info("💰 Sending recovered USDC to user...");
+        const transferTx = await this.tokenService.transfer(CONTRACTS.USDC, userAddress, finalUsdcBalance);
+        txHashes.push(transferTx);
+      }
+
+      const usdcReturned = formatUnits(finalUsdcBalance, 6);
+
+      logger.info(`✅ Recovery completed! USDC returned: ${usdcReturned}`);
+
+      return {
+        success: true,
+        txHashes,
+        usdcReturned,
+      };
+    } catch (error) {
+      logger.error("❌ Token recovery failed:", error);
+      return {
+        success: false,
+        txHashes,
         usdcReturned: "0",
         error: String(error),
       };
