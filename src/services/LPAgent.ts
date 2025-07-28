@@ -254,13 +254,16 @@ export class LPAgent {
 
       // Step 4: Approve tokens for swapping back to USDC
       logger.info("🔓 Step 4a: Approving WETH for swapping...");
+      await sleep(2000); // Add delay before approval
       await this.tokenService.approve(CONTRACTS.WETH, CONTRACTS.AERODROME_ROUTER, wethBalance);
 
       logger.info("🔓 Step 4b: Approving VIRTUAL for swapping...");
+      await sleep(2000); // Add delay before approval
       await this.tokenService.approve(CONTRACTS.VIRTUAL, CONTRACTS.AERODROME_ROUTER, virtualBalance);
 
       // Step 5: Swap WETH → USDC
       logger.info("🔄 Step 5: Swapping WETH → USDC...");
+      await sleep(1000); // Add delay before swap
       const wethToUsdcRoute: SwapRoute[] = [
         {
           from: CONTRACTS.WETH,
@@ -269,7 +272,6 @@ export class LPAgent {
           factory: CONTRACTS.AERODROME_FACTORY,
         },
       ];
-
       const swapWethTx = await this.aerodromeService.swapTokens(
         wethBalance,
         wethToUsdcRoute,
@@ -280,6 +282,7 @@ export class LPAgent {
 
       // Step 6: Swap VIRTUAL → USDC
       logger.info("🔄 Step 6: Swapping VIRTUAL → USDC...");
+      await sleep(1000); // Add delay before swap
       const virtualToUsdcRoute: SwapRoute[] = [
         {
           from: CONTRACTS.VIRTUAL,
